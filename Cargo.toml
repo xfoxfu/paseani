@@ -1,0 +1,2 @@
+[workspace]
+members = ["paseani", "paseani-cli", "paseani-web"]
