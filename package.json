@@ -1,0 +1,21 @@
+{
+  "name": "paseani",
+  "version": "1.0.0",
+  "description": "Parser for animation torrent titles and filenames",
+  "private": true,
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "tsx watch src/index.ts"
+  },
+  "keywords": [],
+  "author": "Yuze Fu <i@xfox.me>",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.18.0",
+    "@typescript-eslint/parser": "^6.18.0",
+    "eslint": "^8.56.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}
