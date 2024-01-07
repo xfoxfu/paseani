@@ -1,6 +1,7 @@
 import express from "express";
+import _ from "lodash";
 import { ILogObj, Logger } from "tslog";
-import { GJYParser, LilithOrAniParser } from "./parser/index.js";
+import { BangumiParser, GJYParser, LilithOrAniParser, Parser } from "./parser/index.js";
 
 const log: Logger<ILogObj> = new Logger();
 
@@ -20,6 +21,15 @@ export interface Result {
   link: string[];
   errors: string[];
   applied_parsers: string[];
+}
+
+// const parsers: Parser[] = [new GJYParser(), new LilithOrAniParser(), new AniDBParser(), new BangumiParser()];
+const parsers: Parser[] = [new GJYParser(), new LilithOrAniParser(), new BangumiParser()];
+for (const parser of parsers) {
+  parser
+    .init()
+    .then(() => log.info(`parser ${parser.name} initialized`))
+    .catch((e) => log.error(e));
 }
 
 app.get("/info", (req, res) => {
@@ -43,12 +53,14 @@ app.get("/info", (req, res) => {
     errors: [],
     applied_parsers: [],
   } satisfies Result;
-  const parsers = [new GJYParser(), new LilithOrAniParser()];
   for (const parser of parsers) {
     if (parser.canParse(name)) {
       result.applied_parsers.push(parser.name);
       result = parser.parse(name, result);
     }
+  }
+  for (const key in result) {
+    result[key as keyof Result] = _.uniq(result[key as keyof Result]);
   }
   res.json(result);
 });
