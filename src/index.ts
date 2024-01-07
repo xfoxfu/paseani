@@ -1,6 +1,6 @@
 import express from "express";
 import { ILogObj, Logger } from "tslog";
-import { GJYParser, LilithParser } from "./parser/index.js";
+import { GJYParser, LilithOrAniParser } from "./parser/index.js";
 
 const log: Logger<ILogObj> = new Logger();
 
@@ -43,7 +43,7 @@ app.get("/info", (req, res) => {
     errors: [],
     applied_parsers: [],
   } satisfies Result;
-  const parsers = [new GJYParser(), new LilithParser()];
+  const parsers = [new GJYParser(), new LilithOrAniParser()];
   for (const parser of parsers) {
     if (parser.canParse(name)) {
       result.applied_parsers.push(parser.name);

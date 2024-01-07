@@ -54,11 +54,12 @@ export class GJYParser extends Parser {
     return previous;
   }
 }
-export class LilithParser extends Parser {
-  readonly regex =
-    /\[Lilith-Raws\] (?<titles>.+?( \/ .+?)*) (- (?<episode>\d+) |\[(?<episodes>\d+-\d+)\])?(?<metas>(\[.+?\])+)/;
 
-  public name = "LilithParser";
+export class LilithOrAniParser extends Parser {
+  readonly regex =
+    /\[(?<team>ANi|Lilith-Raws)\] (?<titles>.+?( \/ .+?)*) (- (?<episode>\d+) |\[(?<episodes>\d+-\d+)\])?(?<metas>(\[.+?\])+)/;
+
+  public name = "LilithOrAniParser";
 
   public canParse(name: string): boolean {
     return name.startsWith("[Lilith-Raws]");
@@ -69,8 +70,12 @@ export class LilithParser extends Parser {
       previous.errors.push("failed to parse with regex");
       return previous;
     }
-    const { titles, episode, episodes, metas } = parsed.groups;
-    previous.team.push("Lilith-Raws");
+    const { team, titles, episode, episodes, metas } = parsed.groups;
+    if (!team || !titles || !metas) {
+      previous.errors.push("missing groups for regex: found " + Object.keys(parsed.groups));
+      return previous;
+    }
+    previous.team.push(team);
     previous.title.push(...(titles?.split("/") ?? []).map((t) => t.trim()));
     if (episode) previous.episode.push(episode);
     // TODO: parse episode range
