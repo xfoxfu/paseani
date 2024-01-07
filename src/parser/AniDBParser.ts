@@ -22,12 +22,12 @@ export class AniDBParser extends Parser {
   }
 
   public override async init(): Promise<void> {
-    const text = await readFile("anidb.dat");
+    const text = await readFile("data/anidb.dat");
     const lines = text.toString("utf8").split("\n");
     const items = lines.filter((l) => !!l && !l.startsWith("#"));
     for (const item of items) {
       // <aid>|<type>|<language>|<title>
-      const [aid, type, lang, title] = item.split("|") as [string, string, string, string];
+      const [aid, _type, lang, title] = item.split("|") as [string, string, string, string];
       const aid_ = Number.parseInt(aid, 10);
       this.mapToId.set(title, aid_);
       if (!this.mapToSyms.has(aid_)) this.mapToSyms.set(aid_, []);

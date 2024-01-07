@@ -3,6 +3,16 @@ import _ from "lodash";
 import * as OpenCC from "opencc-js";
 import { Parser, Result } from "./index.js";
 
+export const parseInfoboxAlias = (infobox: string): string[] => {
+  const infoboxNorm = infobox.replaceAll(/\s\s+/g, "");
+  const aliasRegex = / ?别名 ?= ?{ ?(?<alias>(\[(\w+\|)?.+\])+) ?}/;
+  const aliasMatch = aliasRegex.exec(infoboxNorm);
+  const aliasText = aliasMatch?.groups?.["alias"];
+  if (!aliasText) return [];
+  const aliases = aliasText.split("][").map((a) => _.trim(a, "[]"));
+  return aliases;
+};
+
 export class BangumiParser extends Parser {
   public map: Map<string, number> = new Map();
   public converter = OpenCC.Converter({ from: "t", to: "cn" });
@@ -24,7 +34,7 @@ export class BangumiParser extends Parser {
   }
 
   public override async init(): Promise<void> {
-    const text = await readFile("bangumi/subject.jsonlines");
+    const text = await readFile("data/bangumi/subject.jsonlines");
     const lines = text.toString("utf8").split("\n");
     const items = lines
       .map((l) => {
@@ -40,15 +50,8 @@ export class BangumiParser extends Parser {
       if (item.type !== 2) continue;
       if (item.name) this.map.set(item.name, item.id);
       if (item.name_cn) this.map.set(item.name_cn, item.id);
-      const infobox = item.infobox.replaceAll(/\s\s+/g, "");
-      const aliasRegex = / ?别名 ?= ?{ ?(?<alias>(\[(\w+\|)?.+\])+) ?}/;
-      const aliasMatch = aliasRegex.exec(infobox);
-      const aliasText = aliasMatch?.groups?.["alias"];
-      if (aliasText) {
-        const aliases = aliasText.split("][").map((a) => _.trim(a, "[]"));
-        for (const alias of aliases) {
-          this.map.set(alias, item.id);
-        }
+      for (const alias of parseInfoboxAlias(item.infobox)) {
+        this.map.set(alias, item.id);
       }
     }
   }
