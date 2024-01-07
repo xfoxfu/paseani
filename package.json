@@ -29,6 +29,8 @@
   },
   "dependencies": {
     "express": "^4.18.2",
+    "jszip": "^3.10.1",
+    "ky": "^1.2.0",
     "lodash": "^4.17.21",
     "opencc-js": "^1.0.5",
     "tslog": "^4.9.2"

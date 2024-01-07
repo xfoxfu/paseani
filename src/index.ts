@@ -6,7 +6,7 @@ import { GJYParser } from "./parser/GJYParser.js";
 import { LilithOrAniParser } from "./parser/LilithOrAniParser.js";
 import { Parser, Result } from "./parser/index.js";
 
-const log: Logger<ILogObj> = new Logger();
+export const log: Logger<ILogObj> = new Logger();
 
 const app = express();
 
@@ -49,6 +49,12 @@ app.get("/info", (req, res) => {
     result[key as keyof Result] = _.uniq(result[key as keyof Result]);
   }
   res.json(result);
+});
+
+app.post("/internal/bangumi/update", async (_req, res) => {
+  await BangumiParser.updateData();
+  await parsers.find((x) => x instanceof BangumiParser)?.init();
+  res.json({ status: "ok" });
 });
 
 app.listen(3000);

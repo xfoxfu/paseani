@@ -1,6 +1,9 @@
-import { readFile } from "fs/promises";
+import { readFile, writeFile } from "fs/promises";
+import JSZip from "jszip";
+import ky from "ky";
 import _ from "lodash";
 import * as OpenCC from "opencc-js";
+import { log } from "../index.js";
 import { Parser, Result } from "./index.js";
 
 export const parseInfoboxAlias = (infobox: string): string[] => {
@@ -54,5 +57,21 @@ export class BangumiParser extends Parser {
         this.map.set(alias, item.id);
       }
     }
+  }
+
+  public static async updateData(): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data = await ky("https://api.github.com/repos/bangumi/Archive/releases/tags/archive").json<any>();
+    const asset = _.head(_.sortBy(data.assets, (d) => new Date(d.created_at)));
+    log.info("Found download URL at " + asset.browser_download_url);
+    const zipBin = await ky(asset.browser_download_url).arrayBuffer();
+    const zip = await JSZip.loadAsync(zipBin);
+    log.info("Got archive data file");
+    const subject = await zip.file("subject.jsonlines")?.async("nodebuffer");
+    if (!subject) {
+      log.error("subject.jsonlines not found in bangumi data archive");
+      return;
+    }
+    await writeFile("data/bangumi/subject.jsonlines", subject);
   }
 }
