@@ -1,29 +1,15 @@
 import express from "express";
 import _ from "lodash";
 import { ILogObj, Logger } from "tslog";
-import { BangumiParser, GJYParser, LilithOrAniParser, Parser } from "./parser/index.js";
+import { BangumiParser } from "./parser/BangumiParser.js";
+import { GJYParser } from "./parser/GJYParser.js";
+import { LilithOrAniParser } from "./parser/LilithOrAniParser.js";
+import { Parser, Result } from "./parser/index.js";
 
 const log: Logger<ILogObj> = new Logger();
 
 const app = express();
 
-export interface Result {
-  title: string[];
-  team: string[];
-  episode: string[];
-  source_team: string[];
-  source_type: string[];
-  resolution: string[];
-  subtitle_language: string[];
-  file_type: string[];
-  video_type: string[];
-  audio_type: string[];
-  link: string[];
-  errors: string[];
-  applied_parsers: string[];
-}
-
-// const parsers: Parser[] = [new GJYParser(), new LilithOrAniParser(), new AniDBParser(), new BangumiParser()];
 const parsers: Parser[] = [new GJYParser(), new LilithOrAniParser(), new BangumiParser()];
 for (const parser of parsers) {
   parser
