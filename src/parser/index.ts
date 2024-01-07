@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { Result } from "../index.js";
 
 export abstract class Parser {
@@ -7,7 +8,7 @@ export abstract class Parser {
 }
 
 export class GJYParser extends Parser {
-  readonly regex = /\[GJ.Y\]\s+(?<titles>.+?(\s+\/\s+.+?)*?)(\s+-\s+(?<episode>[\w.]+(\(\w+\))?))?\s+\((?<extra>.+)\)/;
+  readonly regex = /\[GJ.Y\] (?<titles>.+?( \/ .+?)*?)( - (?<episode>[\w.]+(\(\w+\))?))? \((?<extra>.+)\)/;
 
   public name = "GJYParser";
 
@@ -48,6 +49,42 @@ export class GJYParser extends Parser {
       else if (meta === "Donghua") previous;
       else if (meta === "MKV") previous.file_type.push("mkv");
       else if (meta === "MP4") previous.file_type.push("mp4");
+      else previous.errors.push("unexpected metadata " + meta);
+    }
+    return previous;
+  }
+}
+export class LilithParser extends Parser {
+  readonly regex =
+    /\[Lilith-Raws\] (?<titles>.+?( \/ .+?)*) (- (?<episode>\d+) |\[(?<episodes>\d+-\d+)\])?(?<metas>(\[.+?\])+)/;
+
+  public name = "LilithParser";
+
+  public canParse(name: string): boolean {
+    return name.startsWith("[Lilith-Raws]");
+  }
+  public parse(name: string, previous: Result): Result {
+    const parsed = this.regex.exec(name);
+    if (!parsed || !parsed.groups) {
+      previous.errors.push("failed to parse with regex");
+      return previous;
+    }
+    const { titles, episode, episodes, metas } = parsed.groups;
+    previous.team.push("Lilith-Raws");
+    previous.title.push(...(titles?.split("/") ?? []).map((t) => t.trim()));
+    if (episode) previous.episode.push(episode);
+    // TODO: parse episode range
+    if (episodes) previous.episode.push(episodes);
+    for (const meta of (metas?.split("][") ?? []).flatMap((m) => m.split(" "))) {
+      const m = _.trim(meta, "[]");
+      if (m === "Baha") previous.source_team.push("Baha");
+      else if (m === "WEB-DL") previous.source_type.push("Web-DL");
+      else if (m === "WebDL") previous.source_type.push("Web-DL");
+      else if (m === "1080p") previous.resolution.push("1080p");
+      else if (m === "AVC") previous.video_type.push("h264");
+      else if (m === "AAC") previous.audio_type.push("aac");
+      else if (m === "CHT") previous.subtitle_language.push("zh-Hans");
+      else if (m === "MP4") previous.file_type.push("MP4");
       else previous.errors.push("unexpected metadata " + meta);
     }
     return previous;

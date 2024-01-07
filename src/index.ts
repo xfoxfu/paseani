@@ -1,6 +1,6 @@
 import express from "express";
 import { ILogObj, Logger } from "tslog";
-import { GJYParser } from "./parser/index.js";
+import { GJYParser, LilithParser } from "./parser/index.js";
 
 const log: Logger<ILogObj> = new Logger();
 
@@ -23,10 +23,11 @@ export interface Result {
 }
 
 app.get("/info", (req, res) => {
-  const name = req.query["name"] as string;
+  let name = req.query["name"] as string;
   if (typeof name !== "string") {
     res.status(400).send({ error: "Query param `name` must be a string." });
   }
+  name = name.replace(/\s\s+/g, " ");
   let result: Result = {
     title: [],
     team: [],
@@ -42,7 +43,7 @@ app.get("/info", (req, res) => {
     errors: [],
     applied_parsers: [],
   } satisfies Result;
-  const parsers = [new GJYParser()];
+  const parsers = [new GJYParser(), new LilithParser()];
   for (const parser of parsers) {
     if (parser.canParse(name)) {
       result.applied_parsers.push(parser.name);
