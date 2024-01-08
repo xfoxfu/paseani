@@ -25,6 +25,11 @@ export class BangumiParser extends Parser {
   public map: Map<string, number> = new Map();
   public converter = OpenCC.Converter({ from: "t", to: "cn" });
 
+  // eslint-disable-next-line no-unused-vars
+  public constructor(public readonly dataPath: string = "data/bangumi/subject.jsonlines") {
+    super();
+  }
+
   public override name = "BangumiParser";
 
   public override canParse(_name: string): boolean {
@@ -42,7 +47,7 @@ export class BangumiParser extends Parser {
   }
 
   public override async init(): Promise<void> {
-    const text = await readFile("data/bangumi/subject.jsonlines");
+    const text = await readFile(this.dataPath);
     const lines = text.toString("utf8").split("\n");
     const items = lines
       .map((l) => {
@@ -64,7 +69,7 @@ export class BangumiParser extends Parser {
     }
   }
 
-  public static async updateData(): Promise<void> {
+  public async updateData(): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data = await ky("https://api.github.com/repos/bangumi/Archive/releases/tags/archive").json<any>();
     const asset = _.head(_.sortBy(data.assets, (d) => new Date(d.created_at)));
@@ -77,6 +82,6 @@ export class BangumiParser extends Parser {
       log.error("subject.jsonlines not found in bangumi data archive");
       return;
     }
-    await writeFile("data/bangumi/subject.jsonlines", subject);
+    await writeFile(this.dataPath, subject);
   }
 }

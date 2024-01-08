@@ -50,8 +50,9 @@ app.get("/info", (req, res) => {
 });
 
 app.post("/internal/bangumi/update", async (_req, res) => {
-  await BangumiParser.updateData();
-  await parsers.find((x) => x instanceof BangumiParser)?.init();
+  const parser = parsers.find((x) => x instanceof BangumiParser) as BangumiParser | undefined;
+  await parser?.updateData();
+  await parser?.init();
   res.json({ status: "ok" });
 });
 
