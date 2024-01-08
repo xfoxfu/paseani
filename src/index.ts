@@ -1,10 +1,10 @@
-import express from "express";
-import _ from "lodash";
 import { log } from "./log.js";
 import { BangumiParser } from "./parser/BangumiParser.js";
 import { GJYParser } from "./parser/GJYParser.js";
 import { LilithOrAniParser } from "./parser/LilithOrAniParser.js";
 import { Parser, Result } from "./parser/index.js";
+import express from "express";
+import _ from "lodash";
 
 const app = express();
 

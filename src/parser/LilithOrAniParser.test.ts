@@ -1,6 +1,6 @@
-import test_, { TestFn } from "ava";
 import { LilithOrAniParser } from "./LilithOrAniParser.js";
 import { getEmptyResult } from "./index.js";
+import test_, { TestFn } from "ava";
 
 const test = test_ as TestFn<{ parser: LilithOrAniParser }>;
 
@@ -13,7 +13,7 @@ test("can parse properly", (t) => {
   t.deepEqual(
     t.context.parser.parse(
       "[Lilith-Raws] 神推偶像登上武道館我就死而無憾 / Oshibudo - 08 [Baha][WEB-DL][1080p][AVC AAC][CHT][MKV]",
-      getEmptyResult()
+      getEmptyResult(),
     ),
     {
       applied_parsers: [],
@@ -29,12 +29,12 @@ test("can parse properly", (t) => {
       team: ["Lilith-Raws"],
       title: ["神推偶像登上武道館我就死而無憾", "Oshibudo"],
       video_type: ["h264"],
-    }
+    },
   );
   t.deepEqual(
     t.context.parser.parse(
       "[ANi] BUILDDIVIDE - BUILD-DIVIDE -#FFFFFF- CODE WHITE[14][1080P][Baha][WEB-DL][AAC AVC][MP4]",
-      getEmptyResult()
+      getEmptyResult(),
     ),
     {
       applied_parsers: [],
@@ -50,12 +50,12 @@ test("can parse properly", (t) => {
       team: ["ANi"],
       title: ["BUILDDIVIDE - BUILD-DIVIDE -#FFFFFF- CODE WHITE"],
       video_type: ["h264"],
-    }
+    },
   );
   t.deepEqual(
     t.context.parser.parse(
       "[ANi]  打工吧，魔王大人！第二季 [特別篇] - 01 [1080P][Baha][WEB-DL][AAC AVC][CHT][MP4]",
-      getEmptyResult()
+      getEmptyResult(),
     ),
     {
       applied_parsers: [],
@@ -71,6 +71,6 @@ test("can parse properly", (t) => {
       team: ["ANi"],
       title: ["打工吧，魔王大人！第二季 [特別篇]"],
       video_type: ["h264"],
-    }
+    },
   );
 });

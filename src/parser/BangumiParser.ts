@@ -1,10 +1,10 @@
+import { log } from "../log.js";
+import { Parser, Result } from "./index.js";
 import { readFile, writeFile } from "fs/promises";
 import JSZip from "jszip";
 import ky from "ky";
 import _ from "lodash";
 import * as OpenCC from "opencc-js";
-import { log } from "../log.js";
-import { Parser, Result } from "./index.js";
 
 export const parseInfoboxAlias = (infobox: string): string[] => {
   const infoboxNorm = infobox.replaceAll(/\s\s+/g, "");
@@ -16,7 +16,7 @@ export const parseInfoboxAlias = (infobox: string): string[] => {
     aliasText
       .split("][")
       .map((a) => _.trim(a, "[]"))
-      .map((a) => _.last(a.split("|")))
+      .map((a) => _.last(a.split("|"))),
   );
   return aliases;
 };

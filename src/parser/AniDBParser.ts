@@ -1,6 +1,6 @@
+import { Parser, Result } from "./index.js";
 import { readFile } from "fs/promises";
 import _ from "lodash";
-import { Parser, Result } from "./index.js";
 
 export class AniDBParser extends Parser {
   public mapToId: Map<string, number> = new Map();

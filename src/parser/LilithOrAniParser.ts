@@ -1,5 +1,5 @@
-import _ from "lodash";
 import { Parser, Result } from "./index.js";
+import _ from "lodash";
 
 export class LilithOrAniParser extends Parser {
   readonly regex =

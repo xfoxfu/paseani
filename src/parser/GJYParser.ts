@@ -1,5 +1,5 @@
-import _ from "lodash";
 import { Parser, Result } from "./index.js";
+import _ from "lodash";
 
 export class GJYParser extends Parser {
   readonly regex =
@@ -35,8 +35,8 @@ export class GJYParser extends Parser {
         extra2
           ?.split("][")
           .flatMap((m) => m.split(" "))
-          .map((m) => _.trim(m, "[] "))
-      )
+          .map((m) => _.trim(m, "[] ")),
+      ),
     );
     for (const meta of metas) {
       if (meta === "1280x720") previous.resolution.push("720p");
