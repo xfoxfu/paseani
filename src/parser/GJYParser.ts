@@ -1,7 +1,15 @@
+import _ from "lodash";
 import { Parser, Result } from "./index.js";
 
+// [NC-Raws] 龙蛇演义 / Dragon's Disciple - 16 (B-Global Donghua 1920x1080 HEVC AAC MKV)
+// [NC-Raws] 夜夜猫歌 / Yoru wa Neko to Issho - 07 (B-Global 1920x1080 HEVC AAC MKV)
+// [NC-Raws] 白沙的水族馆 / Shiroi Suna no Aquatope - 24 [B-Global][WEB-DL][1080p][AVC AAC][Multiple Subtitle][MKV]
+// 【推しの子】 Opus.COLORs 色彩高校星 - 08 (Baha 1920x1080 AVC AAC MP4)
+// [NC-Raws] 杜鵑婚約 / Kakkou no Iinazuke (A Couple of Cuckoos) - 04 (Baha 1920x1080 AVC AAC MP4)
+
 export class GJYParser extends Parser {
-  readonly regex = /\[GJ.Y\] (?<titles>.+?( \/ .+?)*?)( - (?<episode>[\w.]+(\(\w+\))?))? \((?<extra>.+)\)/;
+  readonly regex =
+    /^(\[.+\]|【推しの子】) (?<titles>.+?( \/ .+?)*?)( - (?<episode>[\w.]+(\(\w+\))?))? (\((?<extra>[^)]+)\))?(?<extra2>(\[[^\]]+\])*)$/;
 
   public override name = "GJYParser";
 
@@ -23,11 +31,20 @@ export class GJYParser extends Parser {
       previous.errors.push("failed to parse with regex");
       return previous;
     }
-    const { titles, episode, extra } = parsed.groups;
+    const { titles, episode, extra, extra2 } = parsed.groups;
     previous.team.push("NC-Raws");
     previous.title.push(...(titles?.split("/") ?? []).map((t) => t.trim()));
     if (episode) previous.episode.push(episode);
-    for (const meta of extra?.split(" ") ?? []) {
+    const metas = _.compact(
+      _.concat(
+        extra?.split(" "),
+        extra2
+          ?.split("][")
+          .flatMap((m) => m.split(" "))
+          .map((m) => _.trim(m, "[] "))
+      )
+    );
+    for (const meta of metas) {
       if (meta === "1280x720") previous.resolution.push("720p");
       else if (meta === "1920x1080") previous.resolution.push("1080p");
       else if (meta === "2048x870") previous.resolution.push("2048x870");
@@ -43,6 +60,12 @@ export class GJYParser extends Parser {
       else if (meta === "Donghua") previous;
       else if (meta === "MKV") previous.file_type.push("mkv");
       else if (meta === "MP4") previous.file_type.push("mp4");
+      else if (meta === "WEB-DL") previous.source_type.push("Web-DL");
+      else if (meta === "1080p") previous.resolution.push("1080p");
+      else if (meta === "Multiple") continue;
+      else if (meta === "Subtitle") continue;
+      else if (meta.includes("x")) previous.resolution.push(meta);
+      else if (meta.startsWith("V")) continue;
       else previous.errors.push("unexpected metadata " + meta);
     }
     return previous;
