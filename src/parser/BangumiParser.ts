@@ -3,7 +3,7 @@ import JSZip from "jszip";
 import ky from "ky";
 import _ from "lodash";
 import * as OpenCC from "opencc-js";
-import { log } from "../index.js";
+import { log } from "../log.js";
 import { Parser, Result } from "./index.js";
 
 export const parseInfoboxAlias = (infobox: string): string[] => {
@@ -12,7 +12,12 @@ export const parseInfoboxAlias = (infobox: string): string[] => {
   const aliasMatch = aliasRegex.exec(infoboxNorm);
   const aliasText = aliasMatch?.groups?.["alias"];
   if (!aliasText) return [];
-  const aliases = aliasText.split("][").map((a) => _.trim(a, "[]"));
+  const aliases = _.compact(
+    aliasText
+      .split("][")
+      .map((a) => _.trim(a, "[]"))
+      .map((a) => _.last(a.split("|")))
+  );
   return aliases;
 };
 

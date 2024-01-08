@@ -1,10 +1,6 @@
 import _ from "lodash";
 import { Parser, Result } from "./index.js";
 
-// [Lilith-Raws] 神推偶像登上武道館我就死而無憾 / Oshibudo - 08 [Baha][WEB-DL][1080p][AVC AAC][CHT][MKV]
-// [ANi] BUILDDIVIDE - BUILD-DIVIDE -#FFFFFF- CODE WHITE[14][1080P][Baha][WEB-DL][AAC AVC][MP4]
-// [ANi]  打工吧，魔王大人！第二季 [特別篇] - 01 [1080P][Baha][WEB-DL][AAC AVC][CHT][MP4]
-
 export class LilithOrAniParser extends Parser {
   readonly regex =
     /^\[(?<team>ANi|Lilith-Raws)\] (?<titles>.+?( \/ .+?)*) ?(- (?<episode>\d+(v\d+)?) |\[(?<episodes>\d+(-\d+)?)\])?(?<metas>(\[[^\]]+?\])+)$/;

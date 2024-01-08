@@ -1,12 +1,10 @@
 import express from "express";
 import _ from "lodash";
-import { ILogObj, Logger } from "tslog";
+import { log } from "./log.js";
 import { BangumiParser } from "./parser/BangumiParser.js";
 import { GJYParser } from "./parser/GJYParser.js";
 import { LilithOrAniParser } from "./parser/LilithOrAniParser.js";
 import { Parser, Result } from "./parser/index.js";
-
-export const log: Logger<ILogObj> = new Logger();
 
 const app = express();
 

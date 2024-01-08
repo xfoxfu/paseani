@@ -1,12 +1,6 @@
 import _ from "lodash";
 import { Parser, Result } from "./index.js";
 
-// [NC-Raws] 龙蛇演义 / Dragon's Disciple - 16 (B-Global Donghua 1920x1080 HEVC AAC MKV)
-// [NC-Raws] 夜夜猫歌 / Yoru wa Neko to Issho - 07 (B-Global 1920x1080 HEVC AAC MKV)
-// [NC-Raws] 白沙的水族馆 / Shiroi Suna no Aquatope - 24 [B-Global][WEB-DL][1080p][AVC AAC][Multiple Subtitle][MKV]
-// 【推しの子】 Opus.COLORs 色彩高校星 - 08 (Baha 1920x1080 AVC AAC MP4)
-// [NC-Raws] 杜鵑婚約 / Kakkou no Iinazuke (A Couple of Cuckoos) - 04 (Baha 1920x1080 AVC AAC MP4)
-
 export class GJYParser extends Parser {
   readonly regex =
     /^(\[.+\]|【推しの子】) (?<titles>.+?( \/ .+?)*?)( - (?<episode>[\w.]+(\(\w+\))?))? (\((?<extra>[^)]+)\))?(?<extra2>(\[[^\]]+\])*)$/;

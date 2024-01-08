@@ -14,6 +14,7 @@
   "author": "Yuze Fu <i@xfox.me>",
   "license": "MIT",
   "devDependencies": {
+    "@ava/typescript": "^4.1.0",
     "@types/express": "^4.17.21",
     "@types/infobox-parser": "^3.3.4",
     "@types/lodash": "^4.14.202",
@@ -24,6 +25,7 @@
     "ava": "^6.0.1",
     "c8": "^9.0.0",
     "eslint": "^8.56.0",
+    "ts-tqdm": "^0.8.6",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3"
   },
@@ -39,11 +41,11 @@
     "printWidth": 120
   },
   "ava": {
-    "extensions": {
-      "ts": "module"
-    },
-    "nodeArguments": [
-      "--import=tsx/esm"
-    ]
+    "typescript": {
+      "rewritePaths": {
+        "src/": "dist/"
+      },
+      "compile": "tsc"
+    }
   }
 }
