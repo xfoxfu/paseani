@@ -44,7 +44,7 @@ test("parse alias in infobox", (t) => {
   ]);
 });
 
-test("add link to bangumi", async (t) => {
+test("add link to bangumi", (t) => {
   const validate = (title: string, link: string) =>
     t.deepEqual(_.uniq(t.context.parser.parse("foobar", { ...getEmptyResult(), title: [title] }).link), [link]);
 

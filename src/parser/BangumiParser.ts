@@ -52,12 +52,12 @@ export class BangumiParser extends Parser {
     const items = lines
       .map((l) => {
         try {
-          return JSON.parse(l);
+          return JSON.parse(l) as { id: number; type: number; name: string; name_cn: string; infobox: string };
         } catch {
           return null;
         }
       })
-      .filter((l) => !!l);
+      .filter((l): l is NonNullable<typeof l> => !!l);
 
     for (const item of items) {
       if (item.type !== 2) continue;
@@ -70,11 +70,12 @@ export class BangumiParser extends Parser {
   }
 
   public async updateData(): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access */
     const data = await ky("https://api.github.com/repos/bangumi/Archive/releases/tags/archive").json<any>();
     const asset = _.head(_.sortBy(data.assets, (d) => new Date(d.created_at)));
     log.info("Found download URL at " + asset.browser_download_url);
     const zipBin = await ky(asset.browser_download_url).arrayBuffer();
+    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access */
     const zip = await JSZip.loadAsync(zipBin);
     log.info("Got archive data file");
     const subject = await zip.file("subject.jsonlines")?.async("nodebuffer");

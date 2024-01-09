@@ -4,7 +4,9 @@ export abstract class Parser {
   public abstract name: string;
   public abstract canParse(_name: string): boolean;
   public abstract parse(_name: string, _previous: Result): Result;
-  public async init(): Promise<void> {}
+  public async init(): Promise<void> {
+    /* nop */
+  }
 }
 
 export interface Result {
