@@ -42,8 +42,8 @@ export class LilithOrAniParser extends Parser {
       else if (m === "CHS") previous.subtitle_language.push("zh-Hans");
       else if (m === "CHT") previous.subtitle_language.push("zh-Hant");
       else if (m === "CHTSRT") previous.subtitle_language.push("zh-Hant");
-      else if (m === "MP4") previous.file_type.push("MP4");
-      else if (m === "MKV") previous.file_type.push("MKV");
+      else if (m === "MP4") previous.file_type.push("mp4");
+      else if (m === "MKV") previous.file_type.push("mkv");
       else if (m === "資金募集中") continue;
       else if (meta.startsWith("V")) continue;
       else previous.errors.push("unexpected metadata " + m);
