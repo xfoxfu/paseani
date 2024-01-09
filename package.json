@@ -7,7 +7,7 @@
   "main": "src/index.ts",
   "scripts": {
     "build": "tsc",
-    "test": "c8 ava",
+    "test": "c8 --all --src src ava",
     "test:watch": "ava --watch",
     "lint:eslint": "eslint 'src/**/*.{ts,tsx}'",
     "lint:prettier": "prettier --ignore-unknown --check 'src/**/*'",
