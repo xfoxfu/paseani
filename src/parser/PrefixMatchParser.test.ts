@@ -1,6 +1,7 @@
 import { PrefixMatchParser } from "./PrefixMatchParser.js";
 import { getEmptyResult } from "./index.js";
 import test from "ava";
+import _ from "lodash";
 
 test("trie works", (t) => {
   const parser = new PrefixMatchParser();
@@ -8,20 +9,26 @@ test("trie works", (t) => {
   parser.loadPrefix("bar", "episode");
   parser.loadBasicPrefix();
 
-  t.deepEqual(parser.parse("FOO/BAR/AA/FOO/BB/BAR", getEmptyResult()), {
-    applied_parsers: [],
-    audio_type: [],
+  t.deepEqual(_.pick(parser.parse("FOO/BAR/AA/FOO/BB/BAR", getEmptyResult()), ["episode", "errors", "title"]), {
     episode: ["BAR", "BAR"],
     errors: ["AA", "BB"],
-    file_type: [],
-    link: [],
-    resolution: [],
-    source_team: [],
-    source_type: [],
-    subtitle_language: [],
-    team: [],
     title: ["FOO", "FOO"],
-    video_type: [],
+  });
+
+  parser.loadPrefix("生肉", "source_type");
+  parser.loadPrefix("darling in the franxx", "title");
+  t.deepEqual(_.pick(parser.parse("darling in the franxx 生肉", getEmptyResult()), ["source_type", "title"]), {
+    source_type: ["生肉"],
+    title: ["darling in the franxx"],
+  });
+
+  // database exists "堀与宫村 " -> next
+  parser.loadPrefix("堀与宫村", "title");
+  parser.loadPrefix("堀与宫村 第二季", "title");
+  t.deepEqual(parser.parse("堀与宫村", getEmptyResult()).title, ["堀与宫村"]);
+  t.deepEqual(_.pick(parser.parse("堀与宫村 NN", getEmptyResult()), ["errors", "title"]), {
+    errors: ["NN"],
+    title: ["堀与宫村"],
   });
 });
 
@@ -48,21 +55,4 @@ test("parses", async (t) => {
       video_type: [],
     },
   );
-
-  parser.loadPrefix("生肉", "source_type");
-  t.deepEqual(parser.parse("darling in the franxx 生肉", getEmptyResult()), {
-    applied_parsers: [],
-    audio_type: [],
-    episode: [],
-    errors: [],
-    file_type: [],
-    link: [],
-    resolution: [],
-    source_team: [],
-    source_type: ["生肉"],
-    subtitle_language: [],
-    team: [],
-    title: ["darling in the franxx"],
-    video_type: [],
-  });
 });

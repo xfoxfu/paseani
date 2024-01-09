@@ -19,30 +19,41 @@ export class PrefixMatchParser extends Parser {
   }
 
   public override parse(name_: string, previous: Result): Result {
-    const name = this.converter(name_).toLowerCase() + " ";
-    let node = this.trie.children.get(name[0]!);
+    const name = this.converter(name_).toLowerCase();
     let i = 0;
-    let accumulated = "";
-    let last_emit_error = false;
-    while (i + 1 < name.length) {
-      accumulated += name_[i];
-      i += 1;
-
-      const next = node?.children.get(name[i]!);
-      if (next && node?.data !== "drop" && !last_emit_error) {
-        node = next;
-      } else {
-        if (!node?.data || (last_emit_error && node.data !== "drop")) {
-          if (last_emit_error) previous.errors[previous.errors.length - 1] += accumulated;
-          else previous.errors.push(accumulated);
-          last_emit_error = true;
-        } else {
-          if (node.data !== "drop") previous[node?.data].push(accumulated);
-          last_emit_error = false;
-        }
-        accumulated = "";
-        node = this.trie.children.get(name[i]!);
+    let last_is_error = false;
+    while (i < name.length) {
+      // forward pass
+      let node = this.trie;
+      let word = "";
+      do {
+        node = node.children.get(name[i]!)!;
+        word += name_[i];
+        i += 1;
+      } while (node?.children.has(name[i]!));
+      if (!node) node = this.trie;
+      // here we reach some point the current node is valid but cannot go to a child
+      // backward pass
+      // go to some point which is associated with an action
+      const revert = { node, word, i };
+      while (!revert.node.data) {
+        if (!revert.node.parent) break;
+        revert.node = revert.node.parent;
+        revert.i -= 1;
+        revert.word = revert.word.substring(0, revert.word.length - 1);
       }
+      if (revert.node !== this.trie) {
+        // revert succeeded, do revert
+        node = revert.node;
+        word = revert.word;
+        i = revert.i;
+      }
+      // take some action
+      if (node.data !== "drop") {
+        if (!last_is_error) previous[node.data ?? "errors"].push(word);
+        else previous.errors[previous.errors.length - 1] += word;
+      }
+      last_is_error = !node.data;
     }
     this.unknownTags.push(...previous.errors);
     return previous;

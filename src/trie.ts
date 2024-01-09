@@ -2,10 +2,14 @@ export class Trie<T> {
   public children = new Map<string, Trie<T>>();
   public data: T | null = null;
 
-  // eslint-disable-next-line no-unused-vars
-  public constructor(public readonly fullString = "") {
+  /* eslint-disable no-unused-vars */
+  public constructor(
+    public readonly parent: Trie<T> | null = null,
+    public readonly fullString = "",
+  ) {
     /* nop */
   }
+  /* eslint-enable no-unused-vars */
 
   public ensureChild(char: string): Trie<T> {
     const child = this.children.get(char);
@@ -13,7 +17,7 @@ export class Trie<T> {
       return child;
     }
 
-    const newChild = new Trie<T>(this.fullString + char);
+    const newChild = new Trie<T>(this, this.fullString + char);
     this.children.set(char, newChild);
     return newChild;
   }
@@ -30,5 +34,18 @@ export class Trie<T> {
     }
 
     this.ensureChild(name[0]!).addChild(name.substring(1), value);
+  }
+
+  public get(name: string): Trie<T> | null {
+    if (name.length === 0) {
+      return this;
+    }
+
+    if (name.length === 1) {
+      return this.children.get(name) ?? null;
+    }
+
+    console.log(name[0], name.substring(1));
+    return this.children.get(name[0]!)?.get(name.substring(1)) ?? null;
   }
 }
