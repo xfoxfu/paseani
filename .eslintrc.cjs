@@ -10,15 +10,9 @@ module.exports = {
   plugins: ["@typescript-eslint"],
   root: true,
   parserOptions: {
-    project: true,
+    project: ["./tsconfig.json", "./tsconfig.eslint.json"],
     tsconfigRootDir: __dirname,
   },
-  overrides: [
-    {
-      extends: ["plugin:@typescript-eslint/disable-type-checked"],
-      files: ["./**/*.{cjs,js}"],
-    },
-  ],
   rules: {
     "no-unused-vars": ["error", { varsIgnorePattern: "^_", argsIgnorePattern: "^_" }],
     "@typescript-eslint/no-unused-vars": ["error", { varsIgnorePattern: "^_", argsIgnorePattern: "^_" }],
