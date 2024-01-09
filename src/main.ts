@@ -2,10 +2,9 @@ import { log } from "./log.js";
 import { BangumiParser } from "./parser/BangumiParser.js";
 import { GJYParser } from "./parser/GJYParser.js";
 import { LilithOrAniParser } from "./parser/LilithOrAniParser.js";
-import { Parser, Result } from "./parser/index.js";
+import { Parser, chainedParse } from "./parser/index.js";
 import Router from "@koa/router";
 import Koa from "koa";
-import _ from "lodash";
 
 const app = new Koa();
 const router = new Router();
@@ -19,36 +18,12 @@ for (const parser of parsers) {
 }
 
 router.get("/info", (ctx) => {
-  let name = ctx.query["name"] as string;
+  const name = ctx.query["name"] as string;
   if (typeof name !== "string") {
     ctx.status = 400;
     ctx.body = { error: "Query param `name` must be a string." };
   }
-  name = name.replace(/\s\s+/g, " ");
-  let result: Result = {
-    title: [],
-    team: [],
-    episode: [],
-    source_team: [],
-    source_type: [],
-    resolution: [],
-    subtitle_language: [],
-    file_type: [],
-    video_type: [],
-    audio_type: [],
-    link: [],
-    errors: [],
-    applied_parsers: [],
-  } satisfies Result;
-  for (const parser of parsers) {
-    if (parser.canParse(name)) {
-      result.applied_parsers.push(parser.name);
-      result = parser.parse(name, result);
-    }
-  }
-  for (const key in result) {
-    result[key as keyof Result] = _.uniq(result[key as keyof Result]);
-  }
+  const result = chainedParse(parsers, name);
   ctx.body = result;
 });
 

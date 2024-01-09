@@ -41,3 +41,18 @@ export const getEmptyResult = (): Result =>
     errors: [],
     applied_parsers: [],
   });
+
+export const chainedParse = (parsers: Parser[], name: string): Result => {
+  const normalizedName = name.replace(/\s\s+/g, " ");
+  let result = getEmptyResult();
+  for (const parser of parsers) {
+    if (parser.canParse(normalizedName)) {
+      result.applied_parsers.push(parser.name);
+      result = parser.parse(normalizedName, result);
+    }
+  }
+  for (const key in result) {
+    result[key as keyof Result] = _.uniq(result[key as keyof Result]);
+  }
+  return result;
+};
