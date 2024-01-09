@@ -3,8 +3,8 @@ import { readFile } from "fs/promises";
 import _ from "lodash";
 
 export class AniDBParser extends Parser {
-  public mapToId: Map<string, number> = new Map();
-  public mapToSyms: Map<number, string[]> = new Map();
+  public mapToId = new Map<string, number>();
+  public mapToSyms = new Map<number, string[]>();
 
   public override name = "AniDBParser";
 

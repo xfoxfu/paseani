@@ -21,7 +21,7 @@ export class GJYParser extends Parser {
 
   public override parse(name: string, previous: Result): Result {
     const parsed = this.regex.exec(name);
-    if (!parsed || !parsed.groups) {
+    if (!parsed?.groups) {
       previous.errors.push("failed to parse with regex");
       return previous;
     }

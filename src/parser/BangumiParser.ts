@@ -22,11 +22,11 @@ export const parseInfoboxAlias = (infobox: string): string[] => {
 };
 
 export class BangumiParser extends Parser {
-  public map: Map<string, number> = new Map();
+  public map = new Map<string, number>();
   public converter = OpenCC.Converter({ from: "t", to: "cn" });
 
   // eslint-disable-next-line no-unused-vars
-  public constructor(public readonly dataPath: string = "data/bangumi/subject.jsonlines") {
+  public constructor(public readonly dataPath = "data/bangumi/subject.jsonlines") {
     super();
   }
 

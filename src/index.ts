@@ -3,10 +3,12 @@ import { BangumiParser } from "./parser/BangumiParser.js";
 import { GJYParser } from "./parser/GJYParser.js";
 import { LilithOrAniParser } from "./parser/LilithOrAniParser.js";
 import { Parser, Result } from "./parser/index.js";
-import express from "express";
+import Router from "@koa/router";
+import Koa from "koa";
 import _ from "lodash";
 
-const app = express();
+const app = new Koa();
+const router = new Router();
 
 const parsers: Parser[] = [new GJYParser(), new LilithOrAniParser(), new BangumiParser()];
 for (const parser of parsers) {
@@ -16,10 +18,11 @@ for (const parser of parsers) {
     .catch((e) => log.error(e));
 }
 
-app.get("/info", (req, res) => {
-  let name = req.query["name"] as string;
+router.get("/info", (ctx) => {
+  let name = ctx.query["name"] as string;
   if (typeof name !== "string") {
-    res.status(400).send({ error: "Query param `name` must be a string." });
+    ctx.status = 400;
+    ctx.body = { error: "Query param `name` must be a string." };
   }
   name = name.replace(/\s\s+/g, " ");
   let result: Result = {
@@ -46,15 +49,15 @@ app.get("/info", (req, res) => {
   for (const key in result) {
     result[key as keyof Result] = _.uniq(result[key as keyof Result]);
   }
-  res.json(result);
+  ctx.body = result;
 });
 
-app.post("/internal/bangumi/update", async (_req, res) => {
+router.post("/internal/bangumi/update", async (ctx) => {
   const parser = parsers.find((x) => x instanceof BangumiParser) as BangumiParser | undefined;
   await parser?.updateData();
   await parser?.init();
-  res.json({ status: "ok" });
+  ctx.body = { status: "ok" };
 });
 
-app.listen(3000);
+app.use(router.routes()).use(router.allowedMethods()).listen(3000);
 log.info("paseani listening on 3000");

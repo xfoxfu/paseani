@@ -25,5 +25,6 @@
     "noPropertyAccessFromIndexSignature": true,
 
     "skipLibCheck": true
-  }
+  },
+  "include": ["src/**/*"]
 }

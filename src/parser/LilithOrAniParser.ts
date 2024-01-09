@@ -13,13 +13,13 @@ export class LilithOrAniParser extends Parser {
 
   public override parse(name: string, previous: Result): Result {
     const parsed = this.regex.exec(name);
-    if (!parsed || !parsed.groups) {
+    if (!parsed?.groups) {
       previous.errors.push("failed to parse with regex");
       return previous;
     }
     const { team, titles, episode, episodes, metas } = parsed.groups;
     if (!team || !titles || !metas) {
-      previous.errors.push("missing groups for regex: found " + Object.keys(parsed.groups));
+      previous.errors.push("missing groups for regex: found " + Object.keys(parsed.groups).join(","));
       return previous;
     }
     previous.team.push(team);
