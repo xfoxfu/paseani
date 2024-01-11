@@ -52,6 +52,7 @@
   },
   "prettier": {
     "printWidth": 120,
+    "quoteProps": "consistent",
     "plugins": [
       "@trivago/prettier-plugin-sort-imports"
     ],

@@ -42,8 +42,8 @@ test("parses", async (t) => {
     {
       applied_parsers: [],
       audio_type: [],
-      episode: [],
-      errors: ["TUcaptions", "2017春", "02", "繁", "720P", "MP4", "新人招募中"],
+      episode: ["02"],
+      errors: ["TUcaptions", "2017春", "繁", "720P", "MP4", "新人招募中"],
       file_type: [],
       link: [],
       resolution: [],
