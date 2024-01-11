@@ -81,6 +81,13 @@ export class PrefixMatchParser extends Parser {
     return previous;
   }
 
+  public override async init(): Promise<void> {
+    this.loadBasicPrefix();
+    await this.loadBangumiData();
+    await this.loadAniDB();
+    this.loadPrefixDB();
+  }
+
   public normalizeName(name: string): string {
     return this.converter(name).toLowerCase();
   }
