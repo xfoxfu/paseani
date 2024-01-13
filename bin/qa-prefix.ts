@@ -24,7 +24,7 @@ const main = async () => {
     if (res.errors.length === 0) {
       perfect += 1;
       status = "perfect";
-    } else if (res.title.length === 0) {
+    } else if (res.title.length === 0 || res.team.length === 0 || res.episode.length === 0) {
       unparsed += 1;
       status = "unparsed";
     } else {

@@ -65,11 +65,12 @@ export class PrefixMatchParser extends Parser {
     }
     // reprocessing of errors
     const splitErrors = _.omit(
-      _.groupBy(previous.errors, (e): TrieData => {
+      _.groupBy(previous.errors, (e_): TrieData => {
+        const e = this.normalizeName(e_);
         if (e.match(/^\d+$/)) return "episode";
         if (e.match(/^\d+-\d+$/)) return "episode";
         if (e.match(/^第\d+话$/)) return "episode";
-        if (e.match(/^\d+(x|x)\d+$/)) return "resolution";
+        if (e.match(/^\d+x\d+$/)) return "resolution";
         if (e.match(/新番$/)) return "drop";
         return "errors";
       }),
