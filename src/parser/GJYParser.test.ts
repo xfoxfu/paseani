@@ -73,24 +73,21 @@ test("can parse properly", (t) => {
       video_type: ["h264"],
     },
   );
-  t.deepEqual(
-    t.context.parser.parse("【推しの子】 Opus.COLORs 色彩高校星 - 08 (Baha 1920x1080 AVC AAC MP4)", getEmptyResult()),
-    {
-      applied_parsers: [],
-      audio_type: ["aac"],
-      episode: ["08"],
-      errors: [],
-      file_type: ["mp4"],
-      link: [],
-      resolution: ["1080p"],
-      source_team: ["Baha"],
-      source_type: [],
-      subtitle_language: [],
-      team: ["NC-Raws"],
-      title: ["Opus.COLORs 色彩高校星"],
-      video_type: ["h264"],
-    },
-  );
+  t.deepEqual(t.context.parser.parse("【推しの子】 Opus.COLORs 色彩高校星 - 08 (Baha 1920x1080 AVC AAC MP4)"), {
+    applied_parsers: [],
+    audio_type: ["aac"],
+    episode: ["08"],
+    errors: [],
+    file_type: ["mp4"],
+    link: [],
+    resolution: ["1080p"],
+    source_team: ["Baha"],
+    source_type: [],
+    subtitle_language: [],
+    team: ["NC-Raws"],
+    title: ["Opus.COLORs 色彩高校星"],
+    video_type: ["h264"],
+  });
   t.deepEqual(
     t.context.parser.parse(
       "[NC-Raws] 杜鵑婚約 / Kakkou no Iinazuke (A Couple of Cuckoos) - 04 (Baha 1920x1080 AVC AAC MP4)",

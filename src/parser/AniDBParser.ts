@@ -1,4 +1,4 @@
-import { Parser, Result } from "./index.js";
+import { Parser, Result, getEmptyResult } from "./index.js";
 import { readFile } from "fs/promises";
 import _ from "lodash";
 
@@ -12,7 +12,7 @@ export class AniDBParser extends Parser {
     return true;
   }
 
-  public override parse(_name: string, previous: Result): Result {
+  public override parse(_name: string, previous: Result = getEmptyResult()): Result {
     const titles = _.clone(previous.title);
     for (const title of titles) {
       const id = this.mapToId.get(title);

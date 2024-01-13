@@ -1,5 +1,5 @@
 import { log } from "../log.js";
-import { Parser, Result } from "./index.js";
+import { Parser, Result, getEmptyResult } from "./index.js";
 import { readFile, writeFile } from "fs/promises";
 import JSZip from "jszip";
 import ky from "ky";
@@ -36,7 +36,7 @@ export class BangumiParser extends Parser {
     return true;
   }
 
-  public override parse(_name: string, previous: Result): Result {
+  public override parse(_name: string, previous: Result = getEmptyResult()): Result {
     for (const title of previous.title) {
       const sid = this.map.get(title);
       if (sid) previous.link.push("https://bgm.tv/subject/" + sid);

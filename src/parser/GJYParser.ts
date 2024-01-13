@@ -1,4 +1,4 @@
-import { Parser, Result } from "./index.js";
+import { Parser, Result, getEmptyResult } from "./index.js";
 import _ from "lodash";
 
 export class GJYParser extends Parser {
@@ -19,7 +19,7 @@ export class GJYParser extends Parser {
     );
   }
 
-  public override parse(name: string, previous: Result): Result {
+  public override parse(name: string, previous: Result = getEmptyResult()): Result {
     const parsed = this.regex.exec(name);
     if (!parsed?.groups) {
       previous.errors.push("failed to parse with regex");

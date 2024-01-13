@@ -1,6 +1,6 @@
 import { Trie } from "../trie.js";
 import { parseInfoboxAlias } from "./BangumiParser.js";
-import { Parser, Result } from "./index.js";
+import { Parser, Result, getEmptyResult } from "./index.js";
 import { prefixdb } from "./prefixdb.js";
 import { readFile } from "fs/promises";
 import _ from "lodash";
@@ -20,7 +20,7 @@ export class PrefixMatchParser extends Parser {
     return true;
   }
 
-  public override parse(name_: string, previous: Result): Result {
+  public override parse(name_: string, previous: Result = getEmptyResult()): Result {
     const name = this.normalizeName(name_);
     let i = 0;
     let last_is_error = false;
