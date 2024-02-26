@@ -630,8 +630,8 @@ video {
   width: 100%;
 }
 
-.max-w-screen-lg {
-  max-width: 1024px;
+.max-w-screen {
+  max-width: 100vw;
 }
 
 @keyframes spin {
@@ -683,6 +683,10 @@ video {
 
 .text-wrap {
   text-wrap: wrap;
+}
+
+.break-words {
+  overflow-wrap: break-word;
 }
 
 .rounded-2xl {
@@ -884,6 +888,18 @@ video {
 .disabled\:bg-slate-500:disabled {
   --tw-bg-opacity: 1;
   background-color: rgb(100 116 139 / var(--tw-bg-opacity));
+}
+
+@media (min-width: 768px) {
+  .md\:max-w-screen-md {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\:max-w-screen-lg {
+    max-width: 1024px;
+  }
 }
 
 @media (prefers-color-scheme: dark) {

@@ -2,7 +2,11 @@
 export default {
   content: ["public/**/*.{html,js}"],
   theme: {
-    extend: {},
+    extend: {
+      maxWidth: {
+        screen: ["100vw"],
+      },
+    },
   },
   plugins: [],
 };
