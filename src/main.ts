@@ -1,3 +1,4 @@
+import { AniDBParser } from "./lib.js";
 import { log } from "./log.js";
 import { BangumiParser } from "./parser/BangumiParser.js";
 import { GJYParser } from "./parser/GJYParser.js";
@@ -11,7 +12,13 @@ import serve from "koa-static";
 const app = new Koa();
 const router = new Router();
 
-const parsers: Parser[] = [new GJYParser(), new LilithOrAniParser(), new PrefixMatchParser(), new BangumiParser()];
+const parsers: Parser[] = [
+  new GJYParser(),
+  new LilithOrAniParser(),
+  new PrefixMatchParser(),
+  new BangumiParser(),
+  new AniDBParser(),
+];
 for (const parser of parsers) {
   parser
     .init()
@@ -31,6 +38,13 @@ router.get("/info", (ctx) => {
 
 router.post("/internal/bangumi/update", async (ctx) => {
   const parser = parsers.find((x) => x instanceof BangumiParser) as BangumiParser | undefined;
+  await parser?.updateData();
+  await parser?.init();
+  ctx.body = { status: "ok" };
+});
+
+router.post("/internal/anidb/update", async (ctx) => {
+  const parser = parsers.find((x) => x instanceof AniDBParser) as AniDBParser | undefined;
   await parser?.updateData();
   await parser?.init();
   ctx.body = { status: "ok" };
