@@ -15,7 +15,8 @@
     "lint:prettier": "prettier --ignore-unknown --check 'src/**/*'",
     "lint": "concurrently 'pnpm:lint:*' --group",
     "format": "prettier --ignore-unknown --write 'src/**/*'",
-    "start": "tsx watch src/main.ts"
+    "start": "node dist/main.js",
+    "start:dev": "tsx watch src/main.ts"
   },
   "keywords": [],
   "author": "Yuze Fu <i@xfox.me>",
