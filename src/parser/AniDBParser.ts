@@ -8,7 +8,7 @@ export class AniDBParser extends Parser {
 
   public override name = "AniDBParser";
 
-  public override canParse(_name: string): boolean {
+  public override canParse(_name: string, _previous: Result = getEmptyResult()): boolean {
     return true;
   }
 

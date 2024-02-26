@@ -3,6 +3,7 @@ import _ from "lodash";
 export abstract class Parser {
   public abstract name: string;
   public abstract canParse(_name: string): boolean;
+  public abstract canParse(_name: string, _previous: Result): boolean;
   public abstract parse(_name: string): Result;
   public abstract parse(_name: string, _previous: Result): Result;
   public async init(): Promise<void> {
@@ -47,7 +48,7 @@ export const chainedParse = (parsers: Parser[], name: string): Result => {
   const normalizedName = name.replace(/\s\s+/g, " ");
   let result = getEmptyResult();
   for (const parser of parsers) {
-    if (parser.canParse(normalizedName)) {
+    if (parser.canParse(normalizedName, result)) {
       result.applied_parsers.push(parser.name);
       result = parser.parse(normalizedName, result);
     }

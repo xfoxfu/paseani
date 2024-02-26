@@ -7,7 +7,7 @@ export class GJYParser extends Parser {
 
   public override name = "GJYParser";
 
-  public override canParse(name: string): boolean {
+  public override canParse(name: string, _previous: Result = getEmptyResult()): boolean {
     return (
       name.startsWith("[DD]") ||
       name.startsWith("[GJ.Y]") ||

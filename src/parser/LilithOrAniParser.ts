@@ -7,7 +7,7 @@ export class LilithOrAniParser extends Parser {
 
   public override name = "LilithOrAniParser";
 
-  public override canParse(name: string): boolean {
+  public override canParse(name: string, _previous: Result = getEmptyResult()): boolean {
     return name.startsWith("[Lilith-Raws]") || name.startsWith("[ANi]");
   }
 

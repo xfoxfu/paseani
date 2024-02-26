@@ -16,8 +16,8 @@ export class PrefixMatchParser extends Parser {
 
   public unknownTags: string[] = [];
 
-  public override canParse(_name: string): boolean {
-    return true;
+  public override canParse(_name: string, previous: Result = getEmptyResult()): boolean {
+    return previous.applied_parsers.length === 0 || previous.title.length === 0;
   }
 
   public override parse(name_: string, previous: Result = getEmptyResult()): Result {

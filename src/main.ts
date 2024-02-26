@@ -2,14 +2,16 @@ import { log } from "./log.js";
 import { BangumiParser } from "./parser/BangumiParser.js";
 import { GJYParser } from "./parser/GJYParser.js";
 import { LilithOrAniParser } from "./parser/LilithOrAniParser.js";
+import { PrefixMatchParser } from "./parser/PrefixMatchParser.js";
 import { Parser, chainedParse } from "./parser/index.js";
 import Router from "@koa/router";
 import Koa from "koa";
+import serve from "koa-static";
 
 const app = new Koa();
 const router = new Router();
 
-const parsers: Parser[] = [new GJYParser(), new LilithOrAniParser(), new BangumiParser()];
+const parsers: Parser[] = [new GJYParser(), new LilithOrAniParser(), new PrefixMatchParser(), new BangumiParser()];
 for (const parser of parsers) {
   parser
     .init()
@@ -34,5 +36,5 @@ router.post("/internal/bangumi/update", async (ctx) => {
   ctx.body = { status: "ok" };
 });
 
-app.use(router.routes()).use(router.allowedMethods()).listen(3000);
+app.use(router.routes()).use(router.allowedMethods()).use(serve("public", {})).listen(3000);
 log.info("paseani listening on 3000");

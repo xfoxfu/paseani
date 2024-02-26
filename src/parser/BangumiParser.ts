@@ -32,7 +32,7 @@ export class BangumiParser extends Parser {
 
   public override name = "BangumiParser";
 
-  public override canParse(_name: string): boolean {
+  public override canParse(_name: string, _previous: Result = getEmptyResult()): boolean {
     return true;
   }
 
