@@ -41,6 +41,10 @@ router.get("/info", (ctx) => {
 });
 
 router.post("/internal/bangumi/update", async (ctx) => {
+  if (ctx.query["token"] ?? "INVALID_TOKEN" !== process.env["PASEANI_ADMIN_TOKEN"]) {
+    ctx.status = 403;
+    return;
+  }
   const parser = parsers.find((x) => x instanceof BangumiParser) as BangumiParser | undefined;
   await parser?.updateData();
   buildParsers();
@@ -49,6 +53,10 @@ router.post("/internal/bangumi/update", async (ctx) => {
 });
 
 router.post("/internal/anidb/update", async (ctx) => {
+  if (ctx.query["token"] ?? "INVALID_TOKEN" !== process.env["PASEANI_ADMIN_TOKEN"]) {
+    ctx.status = 403;
+    return;
+  }
   const parser = parsers.find((x) => x instanceof AniDBParser) as AniDBParser | undefined;
   await parser?.updateData();
   buildParsers();
