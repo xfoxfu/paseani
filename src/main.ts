@@ -12,19 +12,23 @@ import serve from "koa-static";
 const app = new Koa();
 const router = new Router();
 
-const parsers: Parser[] = [
-  new GJYParser(),
-  new LilithOrAniParser(),
-  new PrefixMatchParser(),
-  new BangumiParser(),
-  new AniDBParser(),
-];
-for (const parser of parsers) {
-  parser
-    .init()
-    .then(() => log.info(`parser ${parser.name} initialized`))
-    .catch((e) => log.error(e));
-}
+const buildParsers = () => {
+  parsers = [new GJYParser(), new LilithOrAniParser(), new PrefixMatchParser(), new BangumiParser(), new AniDBParser()];
+};
+const initParsers = async () => {
+  for (const parser of parsers) {
+    try {
+      await parser.init();
+      log.info(`parser ${parser.name} initialized`);
+    } catch (e) {
+      log.error(e);
+    }
+  }
+};
+
+let parsers: Parser[] = [];
+buildParsers();
+void initParsers();
 
 router.get("/info", (ctx) => {
   const name = ctx.query["name"] as string;
@@ -39,14 +43,16 @@ router.get("/info", (ctx) => {
 router.post("/internal/bangumi/update", async (ctx) => {
   const parser = parsers.find((x) => x instanceof BangumiParser) as BangumiParser | undefined;
   await parser?.updateData();
-  await parser?.init();
+  buildParsers();
+  void initParsers();
   ctx.body = { status: "ok" };
 });
 
 router.post("/internal/anidb/update", async (ctx) => {
   const parser = parsers.find((x) => x instanceof AniDBParser) as AniDBParser | undefined;
   await parser?.updateData();
-  await parser?.init();
+  buildParsers();
+  void initParsers();
   ctx.body = { status: "ok" };
 });
 
