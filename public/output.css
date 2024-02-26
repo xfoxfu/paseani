@@ -677,6 +677,10 @@ video {
   margin-bottom: calc(0.5rem * var(--tw-space-y-reverse));
 }
 
+.whitespace-pre-wrap {
+  white-space: pre-wrap;
+}
+
 .text-wrap {
   text-wrap: wrap;
 }
