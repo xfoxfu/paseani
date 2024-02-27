@@ -1,62 +1,67 @@
 import { PrefixMatchParser } from "./PrefixMatchParser.js";
+import { TagType } from "./index.js";
 import test from "ava";
-import _ from "lodash";
 
 test("trie works", (t) => {
   const parser = new PrefixMatchParser();
-  parser.loadPrefix("foo", "title");
-  parser.loadPrefix("bar", "episode");
+  parser.loadPrefix("foo", TagType.title);
+  parser.loadPrefix("bar", TagType.episode);
   parser.loadBasicPrefix();
 
-  t.deepEqual(_.pick(parser.parse("FOO/BAR/AA/FOO/BB/BAR"), ["episode", "errors", "title"]), {
-    episode: ["BAR", "BAR"],
-    errors: ["AA", "BB"],
-    title: ["FOO", "FOO"],
+  t.deepEqual(parser.parse("FOO/BAR/AA/FOO/BB/BAR").build(), {
+    errors: [],
+    tags: [
+      { parser: "PrefixMatchParser", type: "title", value: "FOO" },
+      { parser: "PrefixMatchParser", type: "episode", value: "BAR" },
+      { parser: "PrefixMatchParser", type: "unknown", value: "AA" },
+      { parser: "PrefixMatchParser", type: "unknown", value: "BB" },
+    ],
   });
 
-  parser.loadPrefix("生肉", "source_type");
-  parser.loadPrefix("darling in the franxx", "title");
-  t.deepEqual(_.pick(parser.parse("darling in the franxx 生肉"), ["source_type", "title"]), {
-    source_type: ["生肉"],
-    title: ["darling in the franxx"],
+  parser.loadPrefix("生肉", TagType.source_type);
+  parser.loadPrefix("darling in the franxx", TagType.title);
+  t.deepEqual(parser.parse("darling in the franxx 生肉").build(), {
+    errors: [],
+    tags: [
+      { parser: "PrefixMatchParser", type: "title", value: "darling in the franxx" },
+      { parser: "PrefixMatchParser", type: "source_type", value: "生肉" },
+    ],
   });
 
   // database exists "堀与宫村 " -> next
-  parser.loadPrefix("堀与宫村", "title");
-  parser.loadPrefix("堀与宫村 第二季", "title");
-  t.deepEqual(parser.parse("堀与宫村").title, ["堀与宫村"]);
-  t.deepEqual(_.pick(parser.parse("堀与宫村 NN"), ["errors", "title"]), {
-    errors: ["NN"],
-    title: ["堀与宫村"],
-  });
+  parser.loadPrefix("堀与宫村", TagType.title);
+  parser.loadPrefix("堀与宫村 第二季", TagType.title);
+  t.deepEqual(parser.parse("堀与宫村").tags, [{ type: TagType.title, value: "堀与宫村", parser: "PrefixMatchParser" }]);
+  t.deepEqual(parser.parse("堀与宫村 NN BB").build().tags, [
+    { parser: "PrefixMatchParser", type: TagType.title, value: "堀与宫村" },
+    { parser: "PrefixMatchParser", type: TagType.unknown, value: "NN" },
+    { parser: "PrefixMatchParser", type: TagType.unknown, value: "BB" },
+  ]);
 });
 
 test("parses", (t) => {
   const parser = new PrefixMatchParser();
   parser.loadBasicPrefix();
 
-  parser.loadPrefix("TUcaptions", "team");
+  parser.loadPrefix("TUcaptions", TagType.team);
   parser.loadPrefix("2017春", "drop");
-  parser.loadPrefix("サクラクエスト", "title");
-  parser.loadPrefix("SAKURA QUEST", "title");
-  parser.loadPrefix("02", "episode");
-  parser.loadPrefix("繁", "subtitle_language");
-  parser.loadPrefix("720P", "resolution");
-  parser.loadPrefix("MP4", "file_type");
+  parser.loadPrefix("サクラクエスト", TagType.title);
+  parser.loadPrefix("SAKURA QUEST", TagType.title);
+  parser.loadPrefix("02", TagType.episode);
+  parser.loadPrefix("繁", TagType.subtitle_language);
+  parser.loadPrefix("720P", TagType.resolution);
+  parser.loadPrefix("MP4", TagType.file_type);
   parser.loadPrefix("新人招募中", "drop");
-  t.deepEqual(parser.parse("[TUcaptions][2017春][サクラクエスト/SAKURA QUEST][02][繁][720P MP4](新人招募中)"), {
-    applied_parsers: [],
-    audio_type: [],
-    episode: ["02"],
+  t.deepEqual(parser.parse("[TUcaptions][2017春][サクラクエスト/SAKURA QUEST][02][繁][720P MP4](新人招募中)").build(), {
     errors: [],
-    file_type: ["MP4"],
-    link: [],
-    resolution: ["720P"],
-    source_team: [],
-    source_type: [],
-    subtitle_language: ["繁"],
-    team: ["TUcaptions"],
-    title: ["サクラクエスト", "SAKURA QUEST"],
-    video_type: [],
+    tags: [
+      { parser: "PrefixMatchParser", type: "team", value: "TUCaptions" },
+      { parser: "PrefixMatchParser", type: "title", value: "サクラクエスト" },
+      { parser: "PrefixMatchParser", type: "title", value: "SAKURA QUEST" },
+      { parser: "PrefixMatchParser", type: "episode", value: "02" },
+      { parser: "PrefixMatchParser", type: "subtitle_language", value: "zh-hant" },
+      { parser: "PrefixMatchParser", type: "resolution", value: "720p" },
+      { parser: "PrefixMatchParser", type: "file_type", value: "mp4" },
+    ],
   });
 });

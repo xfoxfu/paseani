@@ -1,4 +1,4 @@
-import { Parser, Result, getEmptyResult } from "./index.js";
+import { Parser, ResultBuilder, TagType } from "./index.js";
 import _ from "lodash";
 
 export class LilithOrAniParser extends Parser {
@@ -7,47 +7,45 @@ export class LilithOrAniParser extends Parser {
 
   public override name = "LilithOrAniParser";
 
-  public override canParse(name: string, _previous: Result = getEmptyResult()): boolean {
+  public override canParse(name: string, _builder: ResultBuilder): boolean {
     return name.startsWith("[Lilith-Raws]") || name.startsWith("[ANi]");
   }
 
-  public override parse(name: string, previous: Result = getEmptyResult()): Result {
+  public override rawParse(name: string, builder: ResultBuilder): void {
     const parsed = this.regex.exec(name);
     if (!parsed?.groups) {
-      previous.errors.push("failed to parse with regex");
-      return previous;
+      builder.addError("failed to parse with regex");
+      return;
     }
     const { team, titles, episode, episodes, metas } = parsed.groups;
     if (!team || !titles || !metas) {
-      previous.errors.push("missing groups for regex: found " + Object.keys(parsed.groups).join(","));
-      return previous;
+      builder.addError("missing groups for regex: found " + Object.keys(parsed.groups).join(","));
     }
-    previous.team.push(team);
-    previous.title.push(...(titles?.split("/") ?? []).map((t) => t.trim()));
-    if (episode) previous.episode.push(episode);
+    builder.addTag(TagType.team, team ?? "");
+    builder.addTags(TagType.title, ...(titles?.split("/") ?? []).map((t) => t.trim()));
+    if (episode) builder.addTag(TagType.episode, episode);
     // TODO: parse episode range
-    if (episodes) previous.episode.push(episodes);
+    if (episodes) builder.addTag(TagType.episode, episodes);
     for (const meta of (metas?.split("][") ?? []).flatMap((m) => m.split(" "))) {
       const m = _.trim(meta, "[]");
-      if (m === "Baha") previous.source_team.push("Baha");
-      else if (m === "BiliBili") previous.source_team.push("Bilibili");
-      else if (m === "Bilibili") previous.source_team.push("Bilibili");
-      else if (m === "WEB-DL") previous.source_type.push("Web-DL");
-      else if (m === "WebDL") previous.source_type.push("Web-DL");
-      else if (m === "1080p") previous.resolution.push("1080p");
-      else if (m === "1080P") previous.resolution.push("1080p");
-      else if (m === "4K") previous.resolution.push("4k");
-      else if (m === "AVC") previous.video_type.push("h264");
-      else if (m === "AAC") previous.audio_type.push("aac");
-      else if (m === "CHS") previous.subtitle_language.push("zh-Hans");
-      else if (m === "CHT") previous.subtitle_language.push("zh-Hant");
-      else if (m === "CHTSRT") previous.subtitle_language.push("zh-Hant");
-      else if (m === "MP4") previous.file_type.push("mp4");
-      else if (m === "MKV") previous.file_type.push("mkv");
+      if (m === "Baha") builder.addTag(TagType.source_team, "Baha");
+      else if (m === "BiliBili") builder.addTag(TagType.source_team, "Bilibili");
+      else if (m === "Bilibili") builder.addTag(TagType.source_team, "Bilibili");
+      else if (m === "WEB-DL") builder.addTag(TagType.source_type, "Web-DL");
+      else if (m === "WebDL") builder.addTag(TagType.source_type, "Web-DL");
+      else if (m === "1080p") builder.addTag(TagType.resolution, "1080p");
+      else if (m === "1080P") builder.addTag(TagType.resolution, "1080p");
+      else if (m === "4K") builder.addTag(TagType.resolution, "4k");
+      else if (m === "AVC") builder.addTag(TagType.video_type, "h264");
+      else if (m === "AAC") builder.addTag(TagType.audio_type, "aac");
+      else if (m === "CHS") builder.addTag(TagType.subtitle_language, "zh-Hans");
+      else if (m === "CHT") builder.addTag(TagType.subtitle_language, "zh-Hant");
+      else if (m === "CHTSRT") builder.addTag(TagType.subtitle_language, "zh-Hant");
+      else if (m === "MP4") builder.addTag(TagType.file_type, "mp4");
+      else if (m === "MKV") builder.addTag(TagType.file_type, "mkv");
       else if (m === "資金募集中") continue;
       else if (meta.startsWith("V")) continue;
-      else previous.errors.push("unexpected metadata " + m);
+      else builder.addTag(TagType.unknown, m);
     }
-    return previous;
   }
 }

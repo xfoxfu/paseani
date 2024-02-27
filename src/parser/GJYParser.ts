@@ -1,13 +1,13 @@
-import { Parser, Result, getEmptyResult } from "./index.js";
+import { Parser, ResultBuilder, TagType } from "./index.js";
 import _ from "lodash";
 
 export class GJYParser extends Parser {
   readonly regex =
-    /^(\[.+\]|【推しの子】) (?<titles>.+?( \/ .+?)*?)( - (?<episode>[\w.]+(\(\w+\))?))? (\((?<extra>[^)]+)\))?(?<extra2>(\[[^\]]+\])*)$/;
+    /^(\[.+\]|【推しの子】) (?<titles>.+?( \/ .+?)*?)( (- )?(?<episode>[\w.]+(\(\w+\))?))? (\((?<extra>[^)]+)\))?(?<extra2>(\[[^\]]+\])*)$/;
 
   public override name = "GJYParser";
 
-  public override canParse(name: string, _previous: Result = getEmptyResult()): boolean {
+  public override canParse(name: string, _builder: ResultBuilder): boolean {
     return (
       name.startsWith("[DD]") ||
       name.startsWith("[GJ.Y]") ||
@@ -19,16 +19,16 @@ export class GJYParser extends Parser {
     );
   }
 
-  public override parse(name: string, previous: Result = getEmptyResult()): Result {
+  public override rawParse(name: string, builder: ResultBuilder) {
     const parsed = this.regex.exec(name);
     if (!parsed?.groups) {
-      previous.errors.push("failed to parse with regex");
-      return previous;
+      builder.addError("failed to parse with regex");
+      return builder;
     }
     const { titles, episode, extra, extra2 } = parsed.groups;
-    previous.team.push("NC-Raws");
-    previous.title.push(...(titles?.split("/") ?? []).map((t) => t.trim()));
-    if (episode) previous.episode.push(episode);
+    builder.addTag(TagType.team, "NC-Raws");
+    builder.addTags(TagType.title, ...(titles?.split("/") ?? []).map((t) => t.trim()));
+    if (episode) builder.addTag(TagType.episode, episode);
     const metas = _.compact(
       _.concat(
         extra?.split(" "),
@@ -39,29 +39,29 @@ export class GJYParser extends Parser {
       ),
     );
     for (const meta of metas) {
-      if (meta === "1280x720") previous.resolution.push("720p");
-      else if (meta === "1920x1080") previous.resolution.push("1080p");
-      else if (meta === "2048x870") previous.resolution.push("2048x870");
-      else if (meta === "2538x1080") previous.resolution.push("2538x1080");
-      else if (meta === "3840x2160") previous.resolution.push("4k");
-      else if (meta === "AAC") previous.audio_type.push("aac");
-      else if (meta === "AVC") previous.video_type.push("h264");
-      else if (meta === "HEVC") previous.video_type.push("h265");
-      else if (meta === "B-Global") previous.source_team.push("B-Global");
-      else if (meta === "Baha") previous.source_team.push("Baha");
-      else if (meta === "CR") previous.source_team.push("CrunchyRoll");
-      else if (meta === "Sentai") previous.source_team.push("Sentai");
-      else if (meta === "Donghua") previous;
-      else if (meta === "MKV") previous.file_type.push("mkv");
-      else if (meta === "MP4") previous.file_type.push("mp4");
-      else if (meta === "WEB-DL") previous.source_type.push("Web-DL");
-      else if (meta === "1080p") previous.resolution.push("1080p");
+      if (meta === "1280x720") builder.addTag(TagType.resolution, "720p");
+      else if (meta === "1920x1080") builder.addTag(TagType.resolution, "1080p");
+      else if (meta === "2048x870") builder.addTag(TagType.resolution, "2048x870");
+      else if (meta === "2538x1080") builder.addTag(TagType.resolution, "2538x1080");
+      else if (meta === "3840x2160") builder.addTag(TagType.resolution, "4k");
+      else if (meta === "AAC") builder.addTag(TagType.audio_type, "aac");
+      else if (meta === "AVC") builder.addTag(TagType.video_type, "h264");
+      else if (meta === "HEVC") builder.addTag(TagType.video_type, "h265");
+      else if (meta === "B-Global") builder.addTag(TagType.source_team, "B-Global");
+      else if (meta === "Baha") builder.addTag(TagType.source_team, "Baha");
+      else if (meta === "CR") builder.addTag(TagType.source_team, "CrunchyRoll");
+      else if (meta === "Sentai") builder.addTag(TagType.source_team, "Sentai");
+      else if (meta === "Donghua") continue;
+      else if (meta === "MKV") builder.addTag(TagType.file_type, "mkv");
+      else if (meta === "MP4") builder.addTag(TagType.file_type, "mp4");
+      else if (meta === "WEB-DL") builder.addTag(TagType.source_type, "Web-DL");
+      else if (meta === "1080p") builder.addTag(TagType.resolution, "1080p");
       else if (meta === "Multiple") continue;
       else if (meta === "Subtitle") continue;
-      else if (meta.includes("x")) previous.resolution.push(meta);
+      else if (meta.includes("x")) builder.addTag(TagType.resolution, meta);
       else if (meta.startsWith("V")) continue;
-      else previous.errors.push("unexpected metadata " + meta);
+      else builder.addTag(TagType.unknown, meta);
     }
-    return previous;
+    return builder;
   }
 }

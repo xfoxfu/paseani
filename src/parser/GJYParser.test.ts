@@ -1,5 +1,4 @@
 import { GJYParser } from "./GJYParser.js";
-import { getEmptyResult } from "./index.js";
 import test_, { TestFn } from "ava";
 
 const test = test_ as TestFn<{ parser: GJYParser }>;
@@ -11,102 +10,93 @@ test.before("prepare parser", async (t) => {
 
 test("can parse properly", (t) => {
   t.deepEqual(
-    t.context.parser.parse(
-      "[NC-Raws] 龙蛇演义 / Dragon's Disciple - 16 (B-Global Donghua 1920x1080 HEVC AAC MKV)",
-      getEmptyResult(),
-    ),
+    t.context.parser
+      .parse("[NC-Raws] 龙蛇演义 / Dragon's Disciple 16 (B-Global Donghua 1920x1080 HEVC AAC MKV)")
+      .build(),
     {
-      applied_parsers: [],
-      audio_type: ["aac"],
-      episode: ["16"],
       errors: [],
-      file_type: ["mkv"],
-      link: [],
-      resolution: ["1080p"],
-      source_team: ["B-Global"],
-      source_type: [],
-      subtitle_language: [],
-      team: ["NC-Raws"],
-      title: ["龙蛇演义", "Dragon's Disciple"],
-      video_type: ["h265"],
+      tags: [
+        { parser: "GJYParser", type: "team", value: "NC-Raws" },
+        { parser: "GJYParser", type: "title", value: "龙蛇演义" },
+        { parser: "GJYParser", type: "title", value: "Dragon's Disciple" },
+        { parser: "GJYParser", type: "episode", value: "16" },
+        { parser: "GJYParser", type: "source_team", value: "B-Global" },
+        { parser: "GJYParser", type: "resolution", value: "1080p" },
+        { parser: "GJYParser", type: "video_type", value: "h265" },
+        { parser: "GJYParser", type: "audio_type", value: "aac" },
+        { parser: "GJYParser", type: "file_type", value: "mkv" },
+      ],
     },
   );
   t.deepEqual(
-    t.context.parser.parse(
-      "[NC-Raws] 夜夜猫歌 / Yoru wa Neko to Issho - 07 (B-Global 1920x1080 HEVC AAC MKV)",
-      getEmptyResult(),
-    ),
+    t.context.parser.parse("[NC-Raws] 夜夜猫歌 / Yoru wa Neko to Issho 07 (B-Global 1920x1080 HEVC AAC MKV)").build(),
     {
-      applied_parsers: [],
-      audio_type: ["aac"],
-      episode: ["07"],
       errors: [],
-      file_type: ["mkv"],
-      link: [],
-      resolution: ["1080p"],
-      source_team: ["B-Global"],
-      source_type: [],
-      subtitle_language: [],
-      team: ["NC-Raws"],
-      title: ["夜夜猫歌", "Yoru wa Neko to Issho"],
-      video_type: ["h265"],
+      tags: [
+        { parser: "GJYParser", type: "team", value: "NC-Raws" },
+        { parser: "GJYParser", type: "title", value: "夜夜猫歌" },
+        { parser: "GJYParser", type: "title", value: "Yoru wa Neko to Issho" },
+        { parser: "GJYParser", type: "episode", value: "07" },
+        { parser: "GJYParser", type: "source_team", value: "B-Global" },
+        { parser: "GJYParser", type: "resolution", value: "1080p" },
+        { parser: "GJYParser", type: "video_type", value: "h265" },
+        { parser: "GJYParser", type: "audio_type", value: "aac" },
+        { parser: "GJYParser", type: "file_type", value: "mkv" },
+      ],
     },
   );
   t.deepEqual(
-    t.context.parser.parse(
-      "[NC-Raws] 白沙的水族馆 / Shiroi Suna no Aquatope - 24 [B-Global][WEB-DL][1080p][AVC AAC][Multiple Subtitle][MKV]",
-      getEmptyResult(),
-    ),
+    t.context.parser
+      .parse(
+        "[NC-Raws] 白沙的水族馆 / Shiroi Suna no Aquatope 24 [B-Global][WEB-DL][1080p][AVC AAC][Multiple Subtitle][MKV]",
+      )
+      .build(),
     {
-      applied_parsers: [],
-      audio_type: ["aac"],
-      episode: ["24"],
       errors: [],
-      file_type: ["mkv"],
-      link: [],
-      resolution: ["1080p"],
-      source_team: ["B-Global"],
-      source_type: ["Web-DL"],
-      subtitle_language: [],
-      team: ["NC-Raws"],
-      title: ["白沙的水族馆", "Shiroi Suna no Aquatope"],
-      video_type: ["h264"],
+      tags: [
+        { parser: "GJYParser", type: "team", value: "NC-Raws" },
+        { parser: "GJYParser", type: "title", value: "白沙的水族馆" },
+        { parser: "GJYParser", type: "title", value: "Shiroi Suna no Aquatope" },
+        { parser: "GJYParser", type: "episode", value: "24" },
+        { parser: "GJYParser", type: "source_team", value: "B-Global" },
+        { parser: "GJYParser", type: "source_type", value: "Web-DL" },
+        { parser: "GJYParser", type: "resolution", value: "1080p" },
+        { parser: "GJYParser", type: "video_type", value: "h264" },
+        { parser: "GJYParser", type: "audio_type", value: "aac" },
+        { parser: "GJYParser", type: "file_type", value: "mkv" },
+      ],
     },
   );
-  t.deepEqual(t.context.parser.parse("【推しの子】 Opus.COLORs 色彩高校星 - 08 (Baha 1920x1080 AVC AAC MP4)"), {
-    applied_parsers: [],
-    audio_type: ["aac"],
-    episode: ["08"],
+  t.deepEqual(t.context.parser.parse("【推しの子】 Opus.COLORs 色彩高校星 08 (Baha 1920x1080 AVC AAC MP4)").build(), {
     errors: [],
-    file_type: ["mp4"],
-    link: [],
-    resolution: ["1080p"],
-    source_team: ["Baha"],
-    source_type: [],
-    subtitle_language: [],
-    team: ["NC-Raws"],
-    title: ["Opus.COLORs 色彩高校星"],
-    video_type: ["h264"],
+    tags: [
+      { parser: "GJYParser", type: "team", value: "NC-Raws" },
+      { parser: "GJYParser", type: "title", value: "Opus.COLORs 色彩高校星" },
+      { parser: "GJYParser", type: "episode", value: "08" },
+      { parser: "GJYParser", type: "source_team", value: "Baha" },
+      { parser: "GJYParser", type: "resolution", value: "1080p" },
+      { parser: "GJYParser", type: "video_type", value: "h264" },
+      { parser: "GJYParser", type: "audio_type", value: "aac" },
+      { parser: "GJYParser", type: "file_type", value: "mp4" },
+    ],
   });
   t.deepEqual(
-    t.context.parser.parse(
-      "[NC-Raws] 杜鵑婚約 / Kakkou no Iinazuke (A Couple of Cuckoos) - 04 (Baha 1920x1080 AVC AAC MP4)",
-      getEmptyResult(),
-    ),
+    t.context.parser
+      .parse("[NC-Raws] 杜鵑婚約 / Kakkou no Iinazuke (A Couple of Cuckoos) 04 (Baha 1920x1080 AVC AAC MP4)")
+      .build(),
     {
-      applied_parsers: [],
-      audio_type: ["aac"],
-      episode: ["04"],
       errors: [],
-      file_type: ["mp4"],
-      link: [],
-      resolution: ["1080p"],
-      source_team: ["Baha"],
-      source_type: [],
-      subtitle_language: [],
-      team: ["NC-Raws"],
-      title: ["杜鵑婚約", "Kakkou no Iinazuke (A Couple of Cuckoos)"],
-      video_type: ["h264"],
+      tags: [
+        { parser: "GJYParser", type: "team", value: "NC-Raws" },
+        { parser: "GJYParser", type: "title", value: "杜鵑婚約" },
+        { parser: "GJYParser", type: "title", value: "Kakkou no Iinazuke (A Couple of Cuckoos)" },
+        { parser: "GJYParser", type: "episode", value: "04" },
+        { parser: "GJYParser", type: "source_team", value: "Baha" },
+        { parser: "GJYParser", type: "resolution", value: "1080p" },
+        { parser: "GJYParser", type: "video_type", value: "h264" },
+        { parser: "GJYParser", type: "audio_type", value: "aac" },
+        { parser: "GJYParser", type: "file_type", value: "mp4" },
+      ],
     },
   );
 });

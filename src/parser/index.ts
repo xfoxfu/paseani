@@ -2,59 +2,90 @@ import _ from "lodash";
 
 export abstract class Parser {
   public abstract name: string;
-  public abstract canParse(_name: string): boolean;
-  public abstract canParse(_name: string, _previous: Result): boolean;
-  public abstract parse(_name: string): Result;
-  public abstract parse(_name: string, _previous: Result): Result;
+  public abstract canParse(_name: string, _builder: ResultBuilder): boolean;
+  protected abstract rawParse(_name: string, _builder: ResultBuilder): void;
+  public parse(name: string, builder: ResultBuilder = new ResultBuilder()): ResultBuilder {
+    builder.withParser(this.name);
+    this.rawParse(name, builder);
+    return builder;
+  }
   public async init(): Promise<void> {
     /* nop */
   }
 }
 
-export interface Result {
-  title: string[];
-  team: string[];
-  episode: string[];
-  source_team: string[];
-  source_type: string[];
-  resolution: string[];
-  subtitle_language: string[];
-  file_type: string[];
-  video_type: string[];
-  audio_type: string[];
-  link: string[];
-  errors: string[];
-  applied_parsers: string[];
+export interface Tag {
+  type: TagType;
+  value: string;
+  parser: string;
 }
 
-export const getEmptyResult = (): Result =>
-  _.cloneDeep({
-    title: [],
-    team: [],
-    episode: [],
-    source_team: [],
-    source_type: [],
-    resolution: [],
-    subtitle_language: [],
-    file_type: [],
-    video_type: [],
-    audio_type: [],
-    link: [],
-    errors: [],
-    applied_parsers: [],
-  });
+export interface ParseError {
+  message: string;
+  parser: string;
+}
+
+export interface Result {
+  tags: Tag[];
+  errors: ParseError[];
+}
+
+export enum TagType {
+  title = "title",
+  team = "team",
+  episode = "episode",
+  source_team = "source_team",
+  source_type = "source_type",
+  resolution = "resolution",
+  subtitle_language = "subtitle_language",
+  file_type = "file_type",
+  video_type = "video_type",
+  audio_type = "audio_type",
+  link = "link",
+  unknown = "unknown",
+}
+
+export class ResultBuilder {
+  public readonly tags: Tag[] = [];
+  public readonly errors: ParseError[] = [];
+  public readonly appliedParsers: string[] = [];
+  public parser = "";
+
+  public withParser(parser: string): typeof this {
+    this.parser = parser;
+    this.appliedParsers.push(parser);
+    return this;
+  }
+
+  public addTag(type: TagType, value: string): typeof this {
+    this.tags.push({ type, value, parser: this.parser });
+    return this;
+  }
+
+  public addTags(type: TagType, ...values: string[]): typeof this {
+    this.tags.push(...values.map((value) => ({ type, value, parser: this.parser })));
+    return this;
+  }
+
+  public addError(message: string): typeof this {
+    this.errors.push({ message, parser: this.parser });
+    return this;
+  }
+
+  public build(): Result {
+    const tags = _.uniqBy(this.tags, (t) => `${t.type}:${t.value}:${t.parser}`);
+    return { tags, errors: this.errors };
+  }
+}
 
 export const chainedParse = (parsers: Parser[], name: string): Result => {
   const normalizedName = name.replace(/\s\s+/g, " ");
-  let result = getEmptyResult();
+  const result = new ResultBuilder();
   for (const parser of parsers) {
     if (parser.canParse(normalizedName, result)) {
-      result.applied_parsers.push(parser.name);
-      result = parser.parse(normalizedName, result);
+      result.appliedParsers.push(parser.name);
+      parser.parse(normalizedName, result);
     }
   }
-  for (const key in result) {
-    result[key as keyof Result] = _.uniq(result[key as keyof Result]);
-  }
-  return result;
+  return result.build();
 };

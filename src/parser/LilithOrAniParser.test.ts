@@ -1,5 +1,4 @@
 import { LilithOrAniParser } from "./LilithOrAniParser.js";
-import { getEmptyResult } from "./index.js";
 import test_, { TestFn } from "ava";
 
 const test = test_ as TestFn<{ parser: LilithOrAniParser }>;
@@ -11,66 +10,63 @@ test.before("prepare parser", async (t) => {
 
 test("can parse properly", (t) => {
   t.deepEqual(
-    t.context.parser.parse(
-      "[Lilith-Raws] 神推偶像登上武道館我就死而無憾 / Oshibudo - 08 [Baha][WEB-DL][1080p][AVC AAC][CHT][MKV]",
-      getEmptyResult(),
-    ),
+    t.context.parser
+      .parse("[Lilith-Raws] 神推偶像登上武道館我就死而無憾 / Oshibudo - 08 [Baha][WEB-DL][1080p][AVC AAC][CHT][MKV]")
+      .build(),
     {
-      applied_parsers: [],
-      audio_type: ["aac"],
-      episode: ["08"],
       errors: [],
-      file_type: ["mkv"],
-      link: [],
-      resolution: ["1080p"],
-      source_team: ["Baha"],
-      source_type: ["Web-DL"],
-      subtitle_language: ["zh-Hant"],
-      team: ["Lilith-Raws"],
-      title: ["神推偶像登上武道館我就死而無憾", "Oshibudo"],
-      video_type: ["h264"],
+      tags: [
+        { parser: "LilithOrAniParser", type: "team", value: "Lilith-Raws" },
+        { parser: "LilithOrAniParser", type: "title", value: "神推偶像登上武道館我就死而無憾" },
+        { parser: "LilithOrAniParser", type: "title", value: "Oshibudo" },
+        { parser: "LilithOrAniParser", type: "episode", value: "08" },
+        { parser: "LilithOrAniParser", type: "source_team", value: "Baha" },
+        { parser: "LilithOrAniParser", type: "source_type", value: "Web-DL" },
+        { parser: "LilithOrAniParser", type: "resolution", value: "1080p" },
+        { parser: "LilithOrAniParser", type: "video_type", value: "h264" },
+        { parser: "LilithOrAniParser", type: "audio_type", value: "aac" },
+        { parser: "LilithOrAniParser", type: "subtitle_language", value: "zh-Hant" },
+        { parser: "LilithOrAniParser", type: "file_type", value: "mkv" },
+      ],
     },
   );
   t.deepEqual(
-    t.context.parser.parse(
-      "[ANi] BUILDDIVIDE - BUILD-DIVIDE -#FFFFFF- CODE WHITE[14][1080P][Baha][WEB-DL][AAC AVC][MP4]",
-      getEmptyResult(),
-    ),
+    t.context.parser
+      .parse("[ANi] BUILDDIVIDE - BUILD-DIVIDE -#FFFFFF- CODE WHITE[14][1080P][Baha][WEB-DL][AAC AVC][MP4]")
+      .build(),
     {
-      applied_parsers: [],
-      audio_type: ["aac"],
-      episode: ["14"],
       errors: [],
-      file_type: ["mp4"],
-      link: [],
-      resolution: ["1080p"],
-      source_team: ["Baha"],
-      source_type: ["Web-DL"],
-      subtitle_language: [],
-      team: ["ANi"],
-      title: ["BUILDDIVIDE - BUILD-DIVIDE -#FFFFFF- CODE WHITE"],
-      video_type: ["h264"],
+      tags: [
+        { parser: "LilithOrAniParser", type: "team", value: "ANi" },
+        { parser: "LilithOrAniParser", type: "title", value: "BUILDDIVIDE - BUILD-DIVIDE -#FFFFFF- CODE WHITE" },
+        { parser: "LilithOrAniParser", type: "episode", value: "14" },
+        { parser: "LilithOrAniParser", type: "resolution", value: "1080p" },
+        { parser: "LilithOrAniParser", type: "source_team", value: "Baha" },
+        { parser: "LilithOrAniParser", type: "source_type", value: "Web-DL" },
+        { parser: "LilithOrAniParser", type: "audio_type", value: "aac" },
+        { parser: "LilithOrAniParser", type: "video_type", value: "h264" },
+        { parser: "LilithOrAniParser", type: "file_type", value: "mp4" },
+      ],
     },
   );
   t.deepEqual(
-    t.context.parser.parse(
-      "[ANi]  打工吧，魔王大人！第二季 [特別篇] - 01 [1080P][Baha][WEB-DL][AAC AVC][CHT][MP4]",
-      getEmptyResult(),
-    ),
+    t.context.parser
+      .parse("[ANi]  打工吧，魔王大人！第二季 [特別篇] - 01 [1080P][Baha][WEB-DL][AAC AVC][CHT][MP4]")
+      .build(),
     {
-      applied_parsers: [],
-      audio_type: ["aac"],
-      episode: ["01"],
       errors: [],
-      file_type: ["mp4"],
-      link: [],
-      resolution: ["1080p"],
-      source_team: ["Baha"],
-      source_type: ["Web-DL"],
-      subtitle_language: ["zh-Hant"],
-      team: ["ANi"],
-      title: ["打工吧，魔王大人！第二季 [特別篇]"],
-      video_type: ["h264"],
+      tags: [
+        { parser: "LilithOrAniParser", type: "team", value: "ANi" },
+        { parser: "LilithOrAniParser", type: "title", value: "打工吧，魔王大人！第二季 [特別篇]" },
+        { parser: "LilithOrAniParser", type: "episode", value: "01" },
+        { parser: "LilithOrAniParser", type: "resolution", value: "1080p" },
+        { parser: "LilithOrAniParser", type: "source_team", value: "Baha" },
+        { parser: "LilithOrAniParser", type: "source_type", value: "Web-DL" },
+        { parser: "LilithOrAniParser", type: "audio_type", value: "aac" },
+        { parser: "LilithOrAniParser", type: "video_type", value: "h264" },
+        { parser: "LilithOrAniParser", type: "subtitle_language", value: "zh-Hant" },
+        { parser: "LilithOrAniParser", type: "file_type", value: "mp4" },
+      ],
     },
   );
 });

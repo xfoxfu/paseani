@@ -1,5 +1,5 @@
 import { log } from "../log.js";
-import { Parser, Result, getEmptyResult } from "./index.js";
+import { Parser, Result, ResultBuilder, TagType } from "./index.js";
 import { readFile, writeFile } from "fs/promises";
 import JSZip from "jszip";
 import ky from "ky";
@@ -32,18 +32,18 @@ export class BangumiParser extends Parser {
 
   public override name = "BangumiParser";
 
-  public override canParse(_name: string, _previous: Result = getEmptyResult()): boolean {
+  public override canParse(_name: string, _builder: ResultBuilder): boolean {
     return true;
   }
 
-  public override parse(_name: string, previous: Result = getEmptyResult()): Result {
-    for (const title of previous.title) {
-      const sid = this.map.get(title);
-      if (sid) previous.link.push("https://bgm.tv/subject/" + sid);
-      const sid2 = this.map.get(this.converter(title));
-      if (sid2) previous.link.push("https://bgm.tv/subject/" + sid2);
+  public override rawParse(_name: string, builder: ResultBuilder): Result {
+    for (const title of builder.tags.filter((t) => t.type === TagType.title)) {
+      const sid = this.map.get(title.value);
+      if (sid) builder.addTag(TagType.link, "https://bgm.tv/subject/" + sid);
+      const sid2 = this.map.get(this.converter(title.value));
+      if (sid2) builder.addTag(TagType.link, "https://bgm.tv/subject/" + sid2);
     }
-    return previous;
+    return builder;
   }
 
   public override async init(): Promise<void> {

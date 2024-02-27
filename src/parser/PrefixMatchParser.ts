@@ -1,12 +1,12 @@
 import { Trie } from "../trie.js";
 import { parseInfoboxAlias } from "./BangumiParser.js";
-import { Parser, Result, getEmptyResult } from "./index.js";
+import { Parser, ResultBuilder, TagType } from "./index.js";
 import { prefixdb } from "./prefixdb.js";
 import { readFile } from "fs/promises";
 import _ from "lodash";
 import * as OpenCC from "opencc-js";
 
-type TrieData = keyof Result | "drop";
+type TrieData = TagType | "drop";
 
 export class PrefixMatchParser extends Parser {
   public readonly trie = new Trie<TrieData>();
@@ -14,13 +14,11 @@ export class PrefixMatchParser extends Parser {
   public override name = "PrefixMatchParser";
   public converter = OpenCC.Converter({ from: "t", to: "cn" });
 
-  public unknownTags: string[] = [];
-
-  public override canParse(_name: string, previous: Result = getEmptyResult()): boolean {
-    return previous.applied_parsers.length === 0 || previous.title.length === 0;
+  public override canParse(_name: string, builder: ResultBuilder): boolean {
+    return builder.appliedParsers.length === 0 || builder.tags.filter((t) => t.type === TagType.title).length === 0;
   }
 
-  public override parse(name_: string, previous: Result = getEmptyResult()): Result {
+  public override rawParse(name_: string, builder: ResultBuilder): void {
     const name = this.normalizeName(name_);
     let i = 0;
     let last_is_error = false;
@@ -61,31 +59,37 @@ export class PrefixMatchParser extends Parser {
         if (!last_is_error) {
           const words = this.normalizeWithDb(word);
           if (Array.isArray(words)) {
-            previous[node.data ?? "errors"].push(...words);
+            builder.addTags(node.data ?? TagType.unknown, ...words);
           } else {
-            previous[node.data ?? "errors"].push(words);
+            builder.addTag(node.data ?? TagType.unknown, words);
           }
-        } else previous.errors[previous.errors.length - 1] += word;
+        } else builder.tags[builder.tags.length - 1]!.value += word;
       }
       last_is_error = !node.data;
     }
     // reprocessing of errors
-    const splitErrors = _.omit(
-      _.groupBy(previous.errors, (e_): TrieData => {
-        const e = this.normalizeName(e_);
-        if (e.match(/^\d+$/)) return "episode";
-        if (e.match(/^\d+-\d+$/)) return "episode";
-        if (e.match(/^第\d+话$/)) return "episode";
-        if (e.match(/^\d+x\d+$/)) return "resolution";
-        if (e.match(/新番$/)) return "drop";
-        return "errors";
-      }),
-      "drop",
+    const splitErrors = _.compact(
+      builder.tags
+        .filter((t) => t.parser === this.name && t.type === TagType.unknown)
+        .map((e_): [TagType, string] | null => {
+          const getType = () => {
+            const e = this.normalizeName(e_.value);
+            if (e.match(/^\d+$/)) return TagType.episode;
+            if (e.match(/^\d+-\d+$/)) return TagType.episode;
+            if (e.match(/^第\d+话$/)) return TagType.episode;
+            if (e.match(/^\d+x\d+$/)) return TagType.resolution;
+            if (e.match(/新番$/)) return "drop";
+            return TagType.unknown;
+          };
+          const type = getType();
+          return type !== "drop" ? [type as TagType, e_.value] : null;
+        }),
     );
-    previous.errors = [];
-    previous = _.merge(previous, splitErrors);
-    this.unknownTags.push(...previous.errors);
-    return previous;
+
+    _.remove(builder.tags, (t) => t.parser === this.name && t.type === TagType.unknown);
+    for (const [type, value] of splitErrors) {
+      builder.addTag(type, value);
+    }
   }
 
   public override async init(): Promise<void> {
@@ -136,10 +140,10 @@ export class PrefixMatchParser extends Parser {
 
     for (const item of items) {
       if (item.type !== 2) continue;
-      if (item.name) this.loadPrefix(item.name, "title");
-      if (item.name_cn) this.loadPrefix(item.name_cn, "title");
+      if (item.name) this.loadPrefix(item.name, TagType.title);
+      if (item.name_cn) this.loadPrefix(item.name_cn, TagType.title);
       for (const alias of parseInfoboxAlias(item.infobox)) {
-        this.loadPrefix(alias, "title");
+        this.loadPrefix(alias, TagType.title);
       }
     }
   }
@@ -151,7 +155,7 @@ export class PrefixMatchParser extends Parser {
     for (const item of items) {
       // <aid>|<type>|<language>|<title>
       const [_type, title] = item.split("|") as [string, string, string, string];
-      this.loadPrefix(title, "title");
+      this.loadPrefix(title, TagType.title);
     }
   }
 

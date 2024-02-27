@@ -1,6 +1,6 @@
 import { log } from "../log.js";
 import { AniDBXml } from "./anidb_xml.js";
-import { Parser, Result, getEmptyResult } from "./index.js";
+import { Parser, Result, ResultBuilder, TagType } from "./index.js";
 import { XMLParser } from "fast-xml-parser";
 import { readFile, writeFile } from "fs/promises";
 import ky from "ky";
@@ -14,17 +14,17 @@ export class AniDBParser extends Parser {
 
   public override name = "AniDBParser";
 
-  public override canParse(_name: string, _previous: Result = getEmptyResult()): boolean {
+  public override canParse(_name: string, _builder: ResultBuilder): boolean {
     return true;
   }
 
-  public override parse(_name: string, previous: Result = getEmptyResult()): Result {
-    const titles = _.clone(previous.title);
+  public override rawParse(_name: string, builder: ResultBuilder): Result {
+    const titles = _.clone(builder.tags.filter((t) => t.type === TagType.title));
     for (const title of titles) {
-      const id = this.mapToId.get(title);
-      if (id) previous.title.push(...(this.mapToSyms.get(id) ?? []));
+      const id = this.mapToId.get(title.value);
+      if (id) builder.addTags(TagType.title, ...(this.mapToSyms.get(id) ?? []));
     }
-    return previous;
+    return builder;
   }
 
   public override async init(): Promise<void> {

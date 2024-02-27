@@ -1,8 +1,7 @@
 import { BangumiParser, parseInfoboxAlias } from "./BangumiParser.js";
-import { getEmptyResult } from "./index.js";
+import { ResultBuilder, TagType } from "./index.js";
 import test_, { TestFn } from "ava";
 import { access, mkdir, writeFile } from "fs/promises";
-import _ from "lodash";
 
 const test = test_ as TestFn<{ parser: BangumiParser }>;
 
@@ -46,9 +45,15 @@ test("parse alias in infobox", (t) => {
 
 test("add link to bangumi", (t) => {
   const validate = (title: string, link: string) =>
-    t.deepEqual(_.uniq(t.context.parser.parse("foobar", { ...getEmptyResult(), title: [title] }).link), [link]);
+    t.deepEqual(
+      t.context.parser
+        .parse("foobar", new ResultBuilder().addTag(TagType.title, title))
+        .build()
+        .tags.filter((t) => t.type === TagType.link),
+      [{ type: TagType.link, value: link, parser: "BangumiParser" }],
+    );
 
-  t.deepEqual(t.context.parser.canParse("foobar"), true);
+  t.deepEqual(t.context.parser.canParse("foobar", new ResultBuilder()), true);
   validate("絆のアリル セカンドシーズン", "https://bgm.tv/subject/443147");
   validate("绊之Allele 第二季", "https://bgm.tv/subject/443147");
   validate("Kizuna no Allele 2nd Season", "https://bgm.tv/subject/443147");
