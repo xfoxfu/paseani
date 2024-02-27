@@ -4,6 +4,7 @@ import { BangumiParser } from "./parser/BangumiParser.js";
 import { GJYParser } from "./parser/GJYParser.js";
 import { LilithOrAniParser } from "./parser/LilithOrAniParser.js";
 import { PrefixMatchParser } from "./parser/PrefixMatchParser.js";
+import { TagNormalizer } from "./parser/TagNormalizer.js";
 import { Parser, chainedParse } from "./parser/index.js";
 import Router from "@koa/router";
 import Koa from "koa";
@@ -13,7 +14,14 @@ const app = new Koa();
 const router = new Router();
 
 const buildParsers = () => {
-  parsers = [new GJYParser(), new LilithOrAniParser(), new PrefixMatchParser(), new BangumiParser(), new AniDBParser()];
+  parsers = [
+    new GJYParser(),
+    new LilithOrAniParser(),
+    new PrefixMatchParser(),
+    new BangumiParser(),
+    new AniDBParser(),
+    new TagNormalizer(),
+  ];
 };
 const initParsers = async () => {
   for (const parser of parsers) {

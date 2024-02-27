@@ -49,6 +49,7 @@ export class BangumiParser extends Parser {
   public override async init(): Promise<void> {
     const file = await open(this.dataPath);
     for await (const line of file.readLines()) {
+      if (line.trim().length === 0) continue;
       try {
         const item = JSON.parse(line) as { id: number; type: number; name: string; name_cn: string; infobox: string };
         if (item.type !== 2) continue;

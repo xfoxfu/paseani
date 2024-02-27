@@ -39,27 +39,11 @@ export class GJYParser extends Parser {
       ),
     );
     for (const meta of metas) {
-      if (meta === "1280x720") builder.addTag(TagType.resolution, "720p");
-      else if (meta === "1920x1080") builder.addTag(TagType.resolution, "1080p");
-      else if (meta === "2048x870") builder.addTag(TagType.resolution, "2048x870");
-      else if (meta === "2538x1080") builder.addTag(TagType.resolution, "2538x1080");
-      else if (meta === "3840x2160") builder.addTag(TagType.resolution, "4k");
-      else if (meta === "AAC") builder.addTag(TagType.audio_type, "aac");
-      else if (meta === "AVC") builder.addTag(TagType.video_type, "h264");
-      else if (meta === "HEVC") builder.addTag(TagType.video_type, "h265");
-      else if (meta === "B-Global") builder.addTag(TagType.source_team, "B-Global");
-      else if (meta === "Baha") builder.addTag(TagType.source_team, "Baha");
-      else if (meta === "CR") builder.addTag(TagType.source_team, "CrunchyRoll");
-      else if (meta === "Sentai") builder.addTag(TagType.source_team, "Sentai");
+      if (meta.match(/^\d+x\d+$/)) builder.addTag(TagType.resolution, meta);
       else if (meta === "Donghua") continue;
-      else if (meta === "MKV") builder.addTag(TagType.file_type, "mkv");
-      else if (meta === "MP4") builder.addTag(TagType.file_type, "mp4");
-      else if (meta === "WEB-DL") builder.addTag(TagType.source_type, "Web-DL");
-      else if (meta === "1080p") builder.addTag(TagType.resolution, "1080p");
       else if (meta === "Multiple") continue;
       else if (meta === "Subtitle") continue;
-      else if (meta.includes("x")) builder.addTag(TagType.resolution, meta);
-      else if (meta.startsWith("V")) continue;
+      else if (meta.match(/^V\d+$/)) continue;
       else builder.addTag(TagType.unknown, meta);
     }
     return builder;

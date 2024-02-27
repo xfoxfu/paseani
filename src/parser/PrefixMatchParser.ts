@@ -58,12 +58,7 @@ export class PrefixMatchParser extends Parser {
       // take some action
       if (node.data !== "drop") {
         if (!last_is_error) {
-          const words = this.normalizeWithDb(word);
-          if (Array.isArray(words)) {
-            builder.addTags(node.data ?? TagType.unknown, ...words);
-          } else {
-            builder.addTag(node.data ?? TagType.unknown, words);
-          }
+          builder.addTag(node.data ?? TagType.unknown, word);
         } else builder.tags[builder.tags.length - 1]!.value += word;
       }
       last_is_error = !node.data;
@@ -79,10 +74,10 @@ export class PrefixMatchParser extends Parser {
         if (e.match(/^\d+-\d+$/)) return TagType.episode;
         if (e.match(/^第\d+话$/)) return TagType.episode;
         if (e.match(/^\d+x\d+$/)) return TagType.resolution;
-        if (e.match(/新番$/)) return "drop";
+        if (e.match(/新番$/)) return null;
         return TagType.unknown;
       })();
-      if (type !== "drop") tag.type = type;
+      if (type !== null) tag.type = type;
       else tag.value = "";
     }
     _.remove(builder.tags, (t) => t.parser === this.name && t.value.length === 0);
@@ -97,16 +92,6 @@ export class PrefixMatchParser extends Parser {
 
   public normalizeName(name: string): string {
     return this.converter(name).toLowerCase();
-  }
-
-  public normalizeWithDb(name: string): string | string[] {
-    const name_ = this.normalizeName(name);
-    if (prefixdb[name_]) {
-      const attempt = prefixdb[name_]![1];
-      if (attempt.includes("|")) return attempt.split("|");
-      return attempt;
-    }
-    return name;
   }
 
   public loadPrefix(name: string, tag: TrieData) {
@@ -152,7 +137,7 @@ export class PrefixMatchParser extends Parser {
 
   public loadPrefixDB() {
     for (const [key, operation] of Object.entries(prefixdb)) {
-      this.loadPrefix(key, operation![0]);
+      this.loadPrefix(key, operation?.[0] ?? "drop");
     }
   }
 }

@@ -55,13 +55,13 @@ test("parses", (t) => {
   t.deepEqual(parser.parse("[TUcaptions][2017春][サクラクエスト/SAKURA QUEST][02][繁][720P MP4](新人招募中)").build(), {
     errors: [],
     tags: [
-      { parser: "PrefixMatchParser", type: "team", value: "TUCaptions" },
+      { parser: "PrefixMatchParser", type: "team", value: "TUcaptions" },
       { parser: "PrefixMatchParser", type: "title", value: "サクラクエスト" },
       { parser: "PrefixMatchParser", type: "title", value: "SAKURA QUEST" },
       { parser: "PrefixMatchParser", type: "episode", value: "02" },
-      { parser: "PrefixMatchParser", type: "subtitle_language", value: "zh-hant" },
-      { parser: "PrefixMatchParser", type: "resolution", value: "720p" },
-      { parser: "PrefixMatchParser", type: "file_type", value: "mp4" },
+      { parser: "PrefixMatchParser", type: "subtitle_language", value: "繁" },
+      { parser: "PrefixMatchParser", type: "resolution", value: "720P" },
+      { parser: "PrefixMatchParser", type: "file_type", value: "MP4" },
     ],
   });
 });

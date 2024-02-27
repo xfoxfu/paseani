@@ -28,22 +28,7 @@ export class LilithOrAniParser extends Parser {
     if (episodes) builder.addTag(TagType.episode, episodes);
     for (const meta of (metas?.split("][") ?? []).flatMap((m) => m.split(" "))) {
       const m = _.trim(meta, "[]");
-      if (m === "Baha") builder.addTag(TagType.source_team, "Baha");
-      else if (m === "BiliBili") builder.addTag(TagType.source_team, "Bilibili");
-      else if (m === "Bilibili") builder.addTag(TagType.source_team, "Bilibili");
-      else if (m === "WEB-DL") builder.addTag(TagType.source_type, "Web-DL");
-      else if (m === "WebDL") builder.addTag(TagType.source_type, "Web-DL");
-      else if (m === "1080p") builder.addTag(TagType.resolution, "1080p");
-      else if (m === "1080P") builder.addTag(TagType.resolution, "1080p");
-      else if (m === "4K") builder.addTag(TagType.resolution, "4k");
-      else if (m === "AVC") builder.addTag(TagType.video_type, "h264");
-      else if (m === "AAC") builder.addTag(TagType.audio_type, "aac");
-      else if (m === "CHS") builder.addTag(TagType.subtitle_language, "zh-Hans");
-      else if (m === "CHT") builder.addTag(TagType.subtitle_language, "zh-Hant");
-      else if (m === "CHTSRT") builder.addTag(TagType.subtitle_language, "zh-Hant");
-      else if (m === "MP4") builder.addTag(TagType.file_type, "mp4");
-      else if (m === "MKV") builder.addTag(TagType.file_type, "mkv");
-      else if (m === "資金募集中") continue;
+      if (m === "資金募集中") continue;
       else if (meta.startsWith("V")) continue;
       else builder.addTag(TagType.unknown, m);
     }
