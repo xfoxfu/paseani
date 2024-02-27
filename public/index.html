@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="output.css" rel="stylesheet" />
+    <link href="style.css" rel="stylesheet" />
     <link rel="icon" type="image/x-icon" href="/favicon.svg" />
     <title>PaseAni</title>
   </head>
@@ -56,7 +56,7 @@
         <h3 class="font-bold">Errors</h3>
         <div class="flex flex-row flex-wrap gap-x-3 gap-y-2" id="errors"></div>
         <pre
-          class="bg-slate-100 font-mono text-wrap px-3 py-2 w-full whitespace-pre-wrap break-words"
+          class="bg-slate-100 font-mono text-wrap px-3 py-2 w-full whitespace-pre-wrap break-words text-xs"
           id="debug"
           hidden
         ></pre>
@@ -67,7 +67,7 @@
       <h2 class="text-xl font-bold">Request</h2>
       <pre
         class="bg-slate-100 font-mono text-wrap px-3 py-2 w-full whitespace-pre-wrap break-words"
-      ><code>HTTP GET https://paseani.zhuiani.me/info?name=<span class="bg-green-100 border-green-700 border-2 p-1">torrent title</span></code></pre>
+      ><code>HTTP GET https://paseani.zhuiani.me/info?name=<span class="bg-green-100 border-green-500 text-green-900 border-2 p-0.5 rounded">torrent title</span></code></pre>
       <h2 class="text-xl font-bold">Response</h2>
       <pre class="bg-slate-100 font-mono text-wrap px-3 py-2 w-full whitespace-pre-wrap break-words"><code>{
   "tags": [{
@@ -171,7 +171,7 @@
                 title: titleInput.value,
                 response: data,
               });
-              debug.innerHTML = `<code>${escape(json)}</code>`;
+              debug.innerHTML = `<code>diagnostic data: ${escape(json)}</code>`;
             }
           })
           .finally(() => {
