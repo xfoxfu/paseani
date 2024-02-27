@@ -7,7 +7,7 @@
     <title>PaseAni</title>
   </head>
   <body class="grid h-screen place-items-center bg-slate-50">
-    <div class="shadow-2xl rounded-2xl px-6 py-4 bg-white space-y-2 container">
+    <div class="shadow-2xl rounded-2xl px-6 py-4 bg-white space-y-2 w-full max-w-screen md:max-w-screen-md">
       <h1 class="text-3xl font-bold">PaseAni</h1>
       <h2 class="text-xl">Torrent Title</h2>
       <form id="form">
@@ -48,8 +48,6 @@
       <div id="result" class="space-y-2" hidden>
         <h3 class="font-bold">Tags</h3>
         <div class="flex flex-row flex-wrap gap-x-3 gap-y-2" id="tags"></div>
-        <h3 class="font-bold">Parsers</h3>
-        <div class="flex flex-row flex-wrap gap-x-3 gap-y-2" id="parsers"></div>
         <h3 class="font-bold">Errors</h3>
         <div class="flex flex-row flex-wrap gap-x-3 gap-y-2" id="errors"></div>
         <pre
@@ -60,6 +58,7 @@
       </div>
     </div>
     <script>
+      const escape = (str) => new Option(str).innerHTML;
       const tagToColor = {
         title: "bg-red-100",
         team: "bg-amber-100",
@@ -72,6 +71,7 @@
         video_type: "bg-blue-100",
         audio_type: "bg-indigo-100",
         link: "bg-purple-100",
+        unknown: "bg-slate-100",
       };
       /** @type HTMLButtonElement */
       const submitButton = document.querySelector("button#submit");
@@ -97,32 +97,35 @@
           .then((res) => res.json())
           .then((data) => {
             document.querySelector("#result").hidden = false;
-            tags.innerHTML = Object.entries(data)
-              .flatMap(([key, values]) =>
-                values.map((value) => {
-                  const span = `<span class="${tagToColor[key]} rounded-full px-4 font-medium"><span class="font-light text-sm mr-1">${key}</span>${value}</span>`;
-                  if (key === "errors" || key === "applied_parsers") return "";
-                  if (key === "link") return `<a href="${value}" target="_blank">${span}</a>`;
-                  return span;
-                }),
-              )
+            tags.innerHTML = data.tags
+              .map(({ type, value, parser }) => {
+                const span = `<div class="flex flex-col items-center"><span class="${
+                  tagToColor[type]
+                } rounded-full px-4 font-medium"><span class="font-light text-sm mr-1">${escape(type)}</span>${escape(
+                  value,
+                )}</span><span class="font-light text-xs ml-1">${escape(parser)}</span></div>`;
+                if (type === "link") return `<a href="${value}" target="_blank">${span}</a>`;
+                return span;
+              })
               .join("");
-            parsers.innerHTML = data.applied_parsers
-              .map((value) => `<span class="bg-slate-100 rounded-full px-4">${value}</span>`)
-              .join("");
-            if (data.errors.length === 0) {
+            if (data.errors.length === 0 && data.tags.filter((t) => t.type === "unknown").length === 0) {
               errors.innerHTML = `<span class="text-green-700">No Error</span>`;
               debug.hidden = true;
             } else {
               errors.innerHTML = data.errors
-                .map((value) => `<span class="text-red-700 underline">${value}</span>`)
+                .map(
+                  ({ parser, message }) =>
+                    `<span class="text-red-700 underline"><span class="font-light text-sm mr-1">${escape(
+                      parser,
+                    )}</span>${escape(message)}</span>`,
+                )
                 .join("");
               debug.hidden = false;
               const json = JSON.stringify({
                 title: titleInput.value,
                 response: data,
               });
-              debug.innerHTML = `<code>${json}</code>`;
+              debug.innerHTML = `<code>${escape(json)}</code>`;
             }
           })
           .finally(() => {
