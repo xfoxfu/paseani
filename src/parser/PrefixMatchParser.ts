@@ -69,28 +69,23 @@ export class PrefixMatchParser extends Parser {
       last_is_error = !node.data;
     }
     // reprocessing of errors
-    const splitErrors = _.compact(
-      builder.tags
-        .filter((t) => t.parser === this.name && t.type === TagType.unknown)
-        .map((e_): [TagType, string] | null => {
-          const getType = () => {
-            const e = this.normalizeName(e_.value);
-            if (e.match(/^\d+$/)) return TagType.episode;
-            if (e.match(/^\d+-\d+$/)) return TagType.episode;
-            if (e.match(/^第\d+话$/)) return TagType.episode;
-            if (e.match(/^\d+x\d+$/)) return TagType.resolution;
-            if (e.match(/新番$/)) return "drop";
-            return TagType.unknown;
-          };
-          const type = getType();
-          return type !== "drop" ? [type as TagType, e_.value] : null;
-        }),
-    );
+    for (const tag of builder.tags) {
+      if (tag.parser !== this.name) continue;
+      if (tag.type !== TagType.unknown) continue;
 
-    _.remove(builder.tags, (t) => t.parser === this.name && t.type === TagType.unknown);
-    for (const [type, value] of splitErrors) {
-      builder.addTag(type, value);
+      const type = (() => {
+        const e = this.normalizeName(tag.value);
+        if (e.match(/^\d+$/)) return TagType.episode;
+        if (e.match(/^\d+-\d+$/)) return TagType.episode;
+        if (e.match(/^第\d+话$/)) return TagType.episode;
+        if (e.match(/^\d+x\d+$/)) return TagType.resolution;
+        if (e.match(/新番$/)) return "drop";
+        return TagType.unknown;
+      })();
+      if (type !== "drop") tag.type = type;
+      else tag.value = "";
     }
+    _.remove(builder.tags, (t) => t.parser === this.name && t.value.length === 0);
   }
 
   public override async init(): Promise<void> {
@@ -118,7 +113,7 @@ export class PrefixMatchParser extends Parser {
     this.trie.addChild(this.normalizeName(name), tag);
   }
 
-  private basicPrefix = " []/_-()【】★（）·◆☆\u{200B}&".split("");
+  private basicPrefix = " []/_-()【】★（）·◆☆\u{200B}&.".split("");
 
   public loadBasicPrefix() {
     for (const p of this.basicPrefix) {
