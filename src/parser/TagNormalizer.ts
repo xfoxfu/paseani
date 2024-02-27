@@ -16,6 +16,7 @@ export class TagNormalizer extends Parser {
     for (const tag of builder.tags) {
       const operation = this.tagdb[this.normalizeName(tag.value)];
       if (operation === undefined) continue;
+      if (tag.parser === this.name) continue;
 
       if (operation === null) {
         tag.value = "";
@@ -24,6 +25,7 @@ export class TagNormalizer extends Parser {
         tag.type = type;
         const [first, ...rest] = valuesExpr.includes("|") ? valuesExpr.split("|") : [valuesExpr];
         tag.value = first ?? "";
+        tag.parser += "*";
         if (rest.length > 0) {
           builder.addTags(type, ...rest);
         }
