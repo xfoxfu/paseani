@@ -58,8 +58,14 @@ export class PrefixMatchParser extends Parser {
       }
       // take some action
       if (node.data !== "drop") {
-        if (!last_is_error) previous[node.data ?? "errors"].push(this.normalizeWithDb(word));
-        else previous.errors[previous.errors.length - 1] += word;
+        if (!last_is_error) {
+          const words = this.normalizeWithDb(word);
+          if (Array.isArray(words)) {
+            previous[node.data ?? "errors"].push(...words);
+          } else {
+            previous[node.data ?? "errors"].push(words);
+          }
+        } else previous.errors[previous.errors.length - 1] += word;
       }
       last_is_error = !node.data;
     }
@@ -93,9 +99,13 @@ export class PrefixMatchParser extends Parser {
     return this.converter(name).toLowerCase();
   }
 
-  public normalizeWithDb(name: string): string {
+  public normalizeWithDb(name: string): string | string[] {
     const name_ = this.normalizeName(name);
-    if (prefixdb[name_]) return prefixdb[name_]![1];
+    if (prefixdb[name_]) {
+      const attempt = prefixdb[name_]![1];
+      if (attempt.includes("|")) return attempt.split("|");
+      return attempt;
+    }
     return name;
   }
 

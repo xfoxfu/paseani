@@ -116,7 +116,6 @@ export const prefixdb: Record<string, [keyof Result | "drop", string] | null> = 
   "异域字幕组": ["team", "异域字幕组"],
   "简繁日内封": ["team", "zh-hans|zh-hant|ja"],
   "漫游字幕组": ["team", "漫游字幕组"],
-  "bit 1080p": ["team", "bit 1080p"],
   "tbs": ["source_team", "TBS"],
   "时雨初空": ["team", "时雨初空"],
   "rh字幕组": ["team", "rh字幕组"],
@@ -198,4 +197,6 @@ export const prefixdb: Record<string, [keyof Result | "drop", string] | null> = 
   "届恋字幕组": ["team", "届恋字幕组"],
   "hevc10": ["video_type", "h265|10-bit"],
   "atx": ["source_team", "ATX"],
+  "10-bit": ["video_type", "10-bit"],
+  "8-bit": ["video_type", "8-bit"],
 };
