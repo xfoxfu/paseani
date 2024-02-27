@@ -7,7 +7,7 @@
     <link rel="icon" type="image/x-icon" href="/favicon.svg" />
     <title>PaseAni</title>
   </head>
-  <body class="grid h-screen place-items-center bg-indigo-50">
+  <body class="grid h-screen place-items-center content-center gap-y-8 bg-indigo-50 my-8">
     <div class="shadow-2xl rounded-2xl px-6 py-4 bg-white space-y-2 w-full max-w-screen md:max-w-screen-md">
       <h1 class="text-3xl font-bold">PaseAni</h1>
       <h2 class="text-xl">Torrent Title</h2>
@@ -56,6 +56,47 @@
           id="debug"
           hidden
         ></pre>
+      </div>
+    </div>
+    <div class="shadow-2xl rounded-2xl px-6 py-4 bg-white space-y-2 w-full max-w-screen md:max-w-screen-md">
+      <h1 class="text-3xl font-bold">API Document</h1>
+      <h2 class="text-xl font-bold">Request</h2>
+      <pre
+        class="bg-slate-100 font-mono text-wrap px-3 py-2 w-full whitespace-pre-wrap break-words"
+      ><code>HTTP GET https://paseani.zhuiani.me/info?name=<span class="bg-green-100 border-green-700 border-2 p-1">torrent title</span></code></pre>
+      <h2 class="text-xl font-bold">Response</h2>
+      <pre class="bg-slate-100 font-mono text-wrap px-3 py-2 w-full whitespace-pre-wrap break-words"><code>{
+  "tags": [{
+    "type": <span class="text-blue-700 underline">type (string)</span>,
+    "value": <span class="text-blue-700 underline">tag value (string)</span>,
+    "parser": <span class="text-blue-700 underline">parser name (string)</span>
+  }],
+  "errors": [{
+    "message": <span class="text-red-700 underline">tag value (string)</span>,
+    "parser": <span class="text-red-700 underline">parser name (string)</span>
+  }]
+}</code></pre>
+      <h2 class="text-xl font-bold">Tag Types</h2>
+      <div>
+        <p><span class="text-red-700 font-mono font-bold">title</span>: anime title</p>
+        <p><span class="text-amber-700 font-mono font-bold">team</span>: publishing team</p>
+        <p><span class="text-yellow-700 font-mono font-bold">episode</span>: episode number or range</p>
+        <p><span class="text-lime-700 font-mono font-bold">source_team</span>: video source website</p>
+        <p>
+          <span class="text-emerald-700 font-mono font-bold">source_type</span>: video source type (BDRip, BDMV, WEB-DL,
+          etc.)
+        </p>
+        <p><span class="text-teal-700 font-mono font-bold">resolution</span>: resolution</p>
+        <p><span class="text-cyan-700 font-mono font-bold">subtitle_language</span>: subtitle language in ISO-639</p>
+        <p><span class="text-sky-700 font-mono font-bold">file_type</span>: file type (mkv, mp4, etc.)</p>
+        <p><span class="text-blue-700 font-mono font-bold">video_type</span>: video encoding type (h264, h265, etc.)</p>
+        <p>
+          <span class="text-indigo-700 font-mono font-bold">audio_type</span>: audio encoding type (aac, flac, etc.)
+        </p>
+        <p><span class="text-purple-700 font-mono font-bold">link</span>: link to external websites</p>
+        <p>
+          <span class="text-slate-700 font-mono font-bold">unknown</span>: tag which cannot tell what it is currently
+        </p>
       </div>
     </div>
     <script>
