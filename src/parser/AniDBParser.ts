@@ -22,7 +22,7 @@ export class AniDBParser extends Parser {
     const titles = _.clone(builder.tags.filter((t) => t.type === TagType.title));
     for (const title of titles) {
       const id = this.mapToId.get(title.value);
-      if (id) builder.addTags(TagType.title, ...(this.mapToSyms.get(id) ?? []));
+      if (id) builder.addTag(TagType.link, `https://anidb.net/anime/${id}`);
     }
     return builder;
   }
