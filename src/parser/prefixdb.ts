@@ -201,4 +201,5 @@ export const prefixdb: Record<string, [TagType, string] | null> = {
   "10-bit": [TagType.video_type, "10-bit"],
   "8-bit": [TagType.video_type, "8-bit"],
   "3840x2160": [TagType.video_type, "4k"],
+  "opus": [TagType.audio_type, "opus"],
 };
