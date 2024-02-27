@@ -1,8 +1,9 @@
+import { log } from "../log.js";
 import { Trie } from "../trie.js";
 import { parseInfoboxAlias } from "./BangumiParser.js";
 import { Parser, ResultBuilder, TagType } from "./index.js";
 import { prefixdb } from "./prefixdb.js";
-import { readFile } from "fs/promises";
+import { open, readFile } from "fs/promises";
 import _ from "lodash";
 import * as OpenCC from "opencc-js";
 
@@ -126,24 +127,19 @@ export class PrefixMatchParser extends Parser {
   }
 
   public async loadBangumiData(): Promise<void> {
-    const text = await readFile("data/bangumi/subject.jsonlines");
-    const lines = text.toString("utf8").split("\n");
-    const items = lines
-      .map((l) => {
-        try {
-          return JSON.parse(l) as { id: number; type: number; name: string; name_cn: string; infobox: string };
-        } catch {
-          return null;
+    const file = await open("data/bangumi/subject.jsonlines");
+    for await (const line of file.readLines()) {
+      try {
+        const item = JSON.parse(line) as { id: number; type: number; name: string; name_cn: string; infobox: string };
+        if (item.type !== 2) continue;
+        if (item.name) this.loadPrefix(item.name, TagType.title);
+        if (item.name_cn) this.loadPrefix(item.name_cn, TagType.title);
+        for (const alias of parseInfoboxAlias(item.infobox)) {
+          this.loadPrefix(alias, TagType.title);
         }
-      })
-      .filter((l): l is NonNullable<typeof l> => !!l);
-
-    for (const item of items) {
-      if (item.type !== 2) continue;
-      if (item.name) this.loadPrefix(item.name, TagType.title);
-      if (item.name_cn) this.loadPrefix(item.name_cn, TagType.title);
-      for (const alias of parseInfoboxAlias(item.infobox)) {
-        this.loadPrefix(alias, TagType.title);
+      } catch (e) {
+        log.error("error when parsing json " + line, e);
+        /* ignore */
       }
     }
   }

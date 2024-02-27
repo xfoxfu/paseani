@@ -1,6 +1,6 @@
 import { log } from "../log.js";
 import { Parser, Result, ResultBuilder, TagType } from "./index.js";
-import { readFile, writeFile } from "fs/promises";
+import { open, writeFile } from "fs/promises";
 import JSZip from "jszip";
 import ky from "ky";
 import _ from "lodash";
@@ -47,24 +47,19 @@ export class BangumiParser extends Parser {
   }
 
   public override async init(): Promise<void> {
-    const text = await readFile(this.dataPath);
-    const lines = text.toString("utf8").split("\n");
-    const items = lines
-      .map((l) => {
-        try {
-          return JSON.parse(l) as { id: number; type: number; name: string; name_cn: string; infobox: string };
-        } catch {
-          return null;
+    const file = await open(this.dataPath);
+    for await (const line of file.readLines()) {
+      try {
+        const item = JSON.parse(line) as { id: number; type: number; name: string; name_cn: string; infobox: string };
+        if (item.type !== 2) continue;
+        if (item.name) this.map.set(item.name, item.id);
+        if (item.name_cn) this.map.set(item.name_cn, item.id);
+        for (const alias of parseInfoboxAlias(item.infobox)) {
+          this.map.set(alias, item.id);
         }
-      })
-      .filter((l): l is NonNullable<typeof l> => !!l);
-
-    for (const item of items) {
-      if (item.type !== 2) continue;
-      if (item.name) this.map.set(item.name, item.id);
-      if (item.name_cn) this.map.set(item.name_cn, item.id);
-      for (const alias of parseInfoboxAlias(item.infobox)) {
-        this.map.set(alias, item.id);
+      } catch (e) {
+        log.error("error when parsing json " + line, e);
+        /* ignore */
       }
     }
   }
@@ -72,7 +67,8 @@ export class BangumiParser extends Parser {
   public async updateData(): Promise<void> {
     /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access */
     const data = await ky("https://api.github.com/repos/bangumi/Archive/releases/tags/archive").json<any>();
-    const asset = _.head(_.sortBy(data.assets, (d) => new Date(d.created_at)));
+    const asset = _.head(_.sortBy(data.assets, (d) => -new Date(d.created_at)));
+    log.debug("Latest asset: ", asset.created_at);
     log.info("Found download URL at " + asset.browser_download_url);
     const zipBin = await ky(asset.browser_download_url).arrayBuffer();
     /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access */
