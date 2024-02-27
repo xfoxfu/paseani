@@ -41,7 +41,7 @@ router.get("/info", (ctx) => {
 });
 
 router.post("/internal/bangumi/update", async (ctx) => {
-  if (ctx.query["token"] ?? "INVALID_TOKEN" !== process.env["PASEANI_ADMIN_TOKEN"]) {
+  if ((ctx.query["token"] ?? "INVALID_TOKEN") !== process.env["PASEANI_ADMIN_TOKEN"]) {
     ctx.status = 403;
     return;
   }
@@ -53,7 +53,7 @@ router.post("/internal/bangumi/update", async (ctx) => {
 });
 
 router.post("/internal/anidb/update", async (ctx) => {
-  if (ctx.query["token"] ?? "INVALID_TOKEN" !== process.env["PASEANI_ADMIN_TOKEN"]) {
+  if ((ctx.query["token"] ?? "INVALID_TOKEN") !== process.env["PASEANI_ADMIN_TOKEN"]) {
     ctx.status = 403;
     return;
   }
