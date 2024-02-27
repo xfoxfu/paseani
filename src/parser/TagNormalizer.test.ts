@@ -28,13 +28,13 @@ test("normalizes tags", async (t) => {
     {
       errors: [],
       tags: [
-        { parser: "PrefixMatchParser", type: "team", value: "TUCaptions" },
+        { parser: "PrefixMatchParser*", type: "team", value: "TUCaptions" },
         { parser: "PrefixMatchParser", type: "title", value: "サクラクエスト" },
         { parser: "PrefixMatchParser", type: "title", value: "SAKURA QUEST" },
         { parser: "PrefixMatchParser", type: "episode", value: "02" },
-        { parser: "PrefixMatchParser", type: "subtitle_language", value: "zh-hant" },
-        { parser: "PrefixMatchParser", type: "resolution", value: "720p" },
-        { parser: "PrefixMatchParser", type: "file_type", value: "mp4" },
+        { parser: "PrefixMatchParser*", type: "subtitle_language", value: "zh-hant" },
+        { parser: "PrefixMatchParser*", type: "resolution", value: "720p" },
+        { parser: "PrefixMatchParser*", type: "file_type", value: "mp4" },
       ],
     },
   );
