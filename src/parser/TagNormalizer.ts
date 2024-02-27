@@ -1,5 +1,6 @@
-import { Parser, ResultBuilder } from "./index.js";
+import { Parser, ResultBuilder, TagType } from "./index.js";
 import { prefixdb } from "./prefixdb.js";
+import _ from "lodash";
 import * as OpenCC from "opencc-js";
 
 export class TagNormalizer extends Parser {
@@ -12,9 +13,18 @@ export class TagNormalizer extends Parser {
     return true;
   }
 
+  protected static readonly regexEp = /^第(\d+)话$/;
+
   public override rawParse(_name: string, builder: ResultBuilder): void {
     for (const tag of builder.tags) {
-      const operation = this.tagdb[this.normalizeName(tag.value)];
+      const tagValue = this.normalizeName(tag.value);
+      const operation = ((): [TagType, string] | null | undefined => {
+        if (TagNormalizer.regexEp.test(tag.value)) {
+          return [TagType.episode, _.trim(tagValue, "第话")];
+        }
+
+        return this.tagdb[tagValue];
+      })();
       if (operation === undefined) continue;
       if (tag.parser === this.name) continue;
 
@@ -31,6 +41,7 @@ export class TagNormalizer extends Parser {
         }
       }
     }
+    _.remove(builder.tags, (t) => t.value.length <= 0);
   }
 
   public override init(): Promise<void> {
