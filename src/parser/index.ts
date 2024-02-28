@@ -57,6 +57,16 @@ export class ResultBuilder {
     return this;
   }
 
+  public addTagWithParser(parser: string, type: TagType, value: string): typeof this {
+    this.tags.push({ type, value, parser });
+    return this;
+  }
+
+  public addTagsWithParser(parser: string, type: TagType, ...values: string[]): typeof this {
+    this.tags.push(...values.map((value) => ({ type, value, parser })));
+    return this;
+  }
+
   public addTag(type: TagType, value: string): typeof this {
     this.tags.push({ type, value, parser: this.parser });
     return this;

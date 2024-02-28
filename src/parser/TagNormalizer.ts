@@ -16,7 +16,9 @@ export class TagNormalizer extends Parser {
   protected static readonly regexEp = /^第(\d+)话$/;
 
   public override rawParse(_name: string, builder: ResultBuilder): void {
-    for (const tag of builder.tags) {
+    const originalTags = _.cloneDeep(builder.tags);
+    _.remove(builder.tags);
+    for (const tag of originalTags) {
       const tagValue = this.normalizeName(tag.value);
       const operation = ((): [TagType, string] | null | undefined => {
         if (TagNormalizer.regexEp.test(tag.value)) {
@@ -25,23 +27,23 @@ export class TagNormalizer extends Parser {
 
         return this.tagdb[tagValue];
       })();
-      if (operation === undefined) continue;
-      if (tag.parser === this.name) continue;
+      // no modification
+      if (operation === undefined || tag.parser === this.name) {
+        builder.addTagWithParser(tag.parser, tag.type, tag.value);
+        continue;
+      }
 
-      if (operation === null) {
-        tag.value = "";
-      } else {
-        const [type, valuesExpr] = operation;
-        tag.type = type;
-        const [first, ...rest] = valuesExpr.includes("|") ? valuesExpr.split("|") : [valuesExpr];
-        tag.value = first ?? "";
-        tag.parser += "*";
-        if (rest.length > 0) {
-          builder.addTags(type, ...rest);
-        }
+      // drop tag
+      if (operation === null) continue;
+
+      // modify tag
+      const [type, valuesExpr] = operation;
+      const [first, ...rest] = valuesExpr.includes("|") ? valuesExpr.split("|") : [valuesExpr];
+      builder.addTagWithParser(tag.parser + (tag.value !== first ? "*" : ""), type, first ?? "");
+      if (rest.length > 0) {
+        builder.addTags(type, ...rest);
       }
     }
-    _.remove(builder.tags, (t) => t.value.length <= 0);
   }
 
   public override init(): Promise<void> {
