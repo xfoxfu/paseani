@@ -22,18 +22,17 @@ export class Trie<T> {
     return newChild;
   }
 
-  public addChild(name: string, value: T) {
+  public addChild(name: string, value: T): Trie<T> {
     if (name.length === 0) {
       this.data = value;
-      return;
+      return this;
     }
 
     if (name.length === 1) {
-      this.ensureChild(name).addChild("", value);
-      return;
+      return this.ensureChild(name).addChild("", value);
     }
 
-    this.ensureChild(name[0]!).addChild(name.substring(1), value);
+    return this.ensureChild(name[0]!).addChild(name.substring(1), value);
   }
 
   public get(name: string): Trie<T> | null {
@@ -45,7 +44,7 @@ export class Trie<T> {
       return this.children.get(name) ?? null;
     }
 
-    console.log(name[0], name.substring(1));
+    // log.debug("trie traverse", name[0], name.substring(1));
     return this.children.get(name[0]!)?.get(name.substring(1)) ?? null;
   }
 }

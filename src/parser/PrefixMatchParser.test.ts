@@ -1,25 +1,27 @@
+import { GlobalDatabase } from "../database/index.js";
 import { PrefixMatchParser } from "./PrefixMatchParser.js";
 import { TagType } from "./index.js";
 import test from "ava";
 
 test("trie works", (t) => {
   const parser = new PrefixMatchParser();
-  parser.loadPrefix("foo", TagType.title);
-  parser.loadPrefix("bar", TagType.episode);
-  parser.loadBasicPrefix();
+  GlobalDatabase.loadPrefix("foo", { type: TagType.title });
+  GlobalDatabase.loadPrefix("bar", { type: TagType.episode });
+  GlobalDatabase.loadBasicPrefix();
 
-  t.deepEqual(parser.parse("FOO/BAR/AA/FOO/BB/BAR").build(), {
+  t.deepEqual(parser.parse("FOO/BAR/AA/FOO/BB/BAR/FOOO").build(), {
     errors: [],
     tags: [
       { parser: "PrefixMatchParser", type: "title", value: "FOO" },
       { parser: "PrefixMatchParser", type: "episode", value: "BAR" },
       { parser: "PrefixMatchParser", type: "unknown", value: "AA" },
       { parser: "PrefixMatchParser", type: "unknown", value: "BB" },
+      { parser: "PrefixMatchParser", type: "unknown", value: "FOOO" },
     ],
   });
 
-  parser.loadPrefix("生肉", TagType.source_type);
-  parser.loadPrefix("darling in the franxx", TagType.title);
+  GlobalDatabase.loadPrefix("生肉", { type: TagType.source_type });
+  GlobalDatabase.loadPrefix("darling in the franxx", { type: TagType.title });
   t.deepEqual(parser.parse("darling in the franxx 生肉").build(), {
     errors: [],
     tags: [
@@ -29,8 +31,8 @@ test("trie works", (t) => {
   });
 
   // database exists "堀与宫村 " -> next
-  parser.loadPrefix("堀与宫村", TagType.title);
-  parser.loadPrefix("堀与宫村 第二季", TagType.title);
+  GlobalDatabase.loadPrefix("堀与宫村", { type: TagType.title });
+  GlobalDatabase.loadPrefix("堀与宫村 第二季", { type: TagType.title });
   t.deepEqual(parser.parse("堀与宫村").tags, [{ type: TagType.title, value: "堀与宫村", parser: "PrefixMatchParser" }]);
   t.deepEqual(parser.parse("堀与宫村 NN BB").build().tags, [
     { parser: "PrefixMatchParser", type: TagType.title, value: "堀与宫村" },
@@ -41,17 +43,17 @@ test("trie works", (t) => {
 
 test("parses", (t) => {
   const parser = new PrefixMatchParser();
-  parser.loadBasicPrefix();
+  GlobalDatabase.loadBasicPrefix();
 
-  parser.loadPrefix("TUcaptions", TagType.team);
-  parser.loadPrefix("2017春", "drop");
-  parser.loadPrefix("サクラクエスト", TagType.title);
-  parser.loadPrefix("SAKURA QUEST", TagType.title);
-  parser.loadPrefix("02", TagType.episode);
-  parser.loadPrefix("繁", TagType.subtitle_language);
-  parser.loadPrefix("720P", TagType.resolution);
-  parser.loadPrefix("MP4", TagType.file_type);
-  parser.loadPrefix("新人招募中", "drop");
+  GlobalDatabase.loadPrefix("TUcaptions", { type: TagType.team });
+  GlobalDatabase.loadPrefix("2017春", { type: TagType.unknown, stdName: [] });
+  GlobalDatabase.loadPrefix("サクラクエスト", { type: TagType.title });
+  GlobalDatabase.loadPrefix("SAKURA QUEST", { type: TagType.title });
+  GlobalDatabase.loadPrefix("02", { type: TagType.episode });
+  GlobalDatabase.loadPrefix("繁", { type: TagType.subtitle_language });
+  GlobalDatabase.loadPrefix("720P", { type: TagType.resolution });
+  GlobalDatabase.loadPrefix("MP4", { type: TagType.file_type });
+  GlobalDatabase.loadPrefix("新人招募中", { type: TagType.unknown, stdName: [] });
   t.deepEqual(parser.parse("[TUcaptions][2017春][サクラクエスト/SAKURA QUEST][02][繁][720P MP4](新人招募中)").build(), {
     errors: [],
     tags: [

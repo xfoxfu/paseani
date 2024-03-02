@@ -1,10 +1,11 @@
 import { log } from "../log.js";
-import { Parser, Result, ResultBuilder, TagType } from "./index.js";
-import { open, writeFile } from "fs/promises";
+import { TagType } from "../parser/index.js";
+import { RawDatabase } from "./RawDatabase.js";
+import { Data } from "./index.js";
 import JSZip from "jszip";
 import ky from "ky";
 import _ from "lodash";
-import * as OpenCC from "opencc-js";
+import { open, writeFile } from "node:fs/promises";
 
 export const parseInfoboxAlias = (infobox: string): string[] => {
   const infoboxNorm = infobox.replaceAll(/\s\s+/g, "");
@@ -21,42 +22,34 @@ export const parseInfoboxAlias = (infobox: string): string[] => {
   return aliases;
 };
 
-export class BangumiParser extends Parser {
-  public map = new Map<string, number>();
-  public converter = OpenCC.Converter({ from: "t", to: "cn" });
-
-  // eslint-disable-next-line no-unused-vars
-  public constructor(public readonly dataPath = "data/bangumi/subject.jsonlines") {
+export class BangumiDatabase extends RawDatabase {
+  constructor(public readonly dataPath = "data/bangumi/subject.jsonlines") {
     super();
   }
 
-  public override name = "BangumiParser";
+  public override name = "BangumiDatabase";
 
-  public override canParse(_name: string, _builder: ResultBuilder): boolean {
-    return true;
-  }
-
-  public override rawParse(_name: string, builder: ResultBuilder): Result {
-    for (const title of builder.tags.filter((t) => t.type === TagType.title)) {
-      const sid = this.map.get(title.value);
-      if (sid) builder.addTag(TagType.link, "https://bgm.tv/subject/" + sid);
-      const sid2 = this.map.get(this.converter(title.value));
-      if (sid2) builder.addTag(TagType.link, "https://bgm.tv/subject/" + sid2);
-    }
-    return builder;
-  }
-
-  public override async init(): Promise<void> {
+  public override async *list(): AsyncIterable<Data> {
     const file = await open(this.dataPath);
     for await (const line of file.readLines()) {
       if (line.trim().length === 0) continue;
       try {
         const item = JSON.parse(line) as { id: number; type: number; name: string; name_cn: string; infobox: string };
         if (item.type !== 2) continue;
-        if (item.name) this.map.set(item.name, item.id);
-        if (item.name_cn) this.map.set(item.name_cn, item.id);
+        if (!item.name && !item.name_cn) {
+          log.warn(`bangumi item ${item.id} without name and name_cn`);
+          continue;
+        }
+        const link = `https://bgm.tv/subject/${item.id}`;
+        const stdName = [item.name ?? item.name_cn];
+        if (item.name) {
+          yield { name: item.name, type: TagType.title, link };
+        }
+        if (item.name_cn) {
+          yield { name: item.name_cn, type: TagType.title, link, stdName };
+        }
         for (const alias of parseInfoboxAlias(item.infobox)) {
-          this.map.set(alias, item.id);
+          yield { name: alias, type: TagType.title, link, stdName };
         }
       } catch (e) {
         log.error("error when parsing json " + line, e);
@@ -65,7 +58,7 @@ export class BangumiParser extends Parser {
     }
   }
 
-  public async updateData(): Promise<void> {
+  public override async update(): Promise<void> {
     /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access */
     const data = await ky("https://api.github.com/repos/bangumi/Archive/releases/tags/archive").json<any>();
     const asset = _.head(_.sortBy(data.assets, (d) => -new Date(d.created_at)));
@@ -81,5 +74,7 @@ export class BangumiParser extends Parser {
       return;
     }
     await writeFile(this.dataPath, subject);
+
+    log.info("bangumi updated at " + this.dataPath);
   }
 }

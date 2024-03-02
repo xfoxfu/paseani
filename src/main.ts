@@ -1,6 +1,6 @@
-import { AniDBParser } from "./lib.js";
+import { GlobalDatabase } from "./database/index.js";
+import { LinkEnricher } from "./lib.js";
 import { log } from "./log.js";
-import { BangumiParser } from "./parser/BangumiParser.js";
 import { GJYParser } from "./parser/GJYParser.js";
 import { LilithOrAniParser } from "./parser/LilithOrAniParser.js";
 import { PrefixMatchParser } from "./parser/PrefixMatchParser.js";
@@ -18,12 +18,12 @@ const buildParsers = () => {
     new GJYParser(),
     new LilithOrAniParser(),
     new PrefixMatchParser(),
-    new BangumiParser(),
-    new AniDBParser(),
+    new LinkEnricher(),
     new TagNormalizer(),
   ];
 };
 const initParsers = async () => {
+  await GlobalDatabase.init();
   for (const parser of parsers) {
     try {
       await parser.init();
@@ -48,27 +48,18 @@ router.get("/info", (ctx) => {
   ctx.body = result;
 });
 
-router.post("/internal/bangumi/update", async (ctx) => {
+router.post("/internal/database/update", async (ctx) => {
   if ((ctx.query["token"] ?? "INVALID_TOKEN") !== process.env["PASEANI_ADMIN_TOKEN"]) {
     ctx.status = 403;
     return;
   }
-  const parser = parsers.find((x) => x instanceof BangumiParser) as BangumiParser | undefined;
-  await parser?.updateData();
-  buildParsers();
-  void initParsers();
-  ctx.body = { status: "ok" };
-});
-
-router.post("/internal/anidb/update", async (ctx) => {
-  if ((ctx.query["token"] ?? "INVALID_TOKEN") !== process.env["PASEANI_ADMIN_TOKEN"]) {
-    ctx.status = 403;
-    return;
-  }
-  const parser = parsers.find((x) => x instanceof AniDBParser) as AniDBParser | undefined;
-  await parser?.updateData();
-  buildParsers();
-  void initParsers();
+  await Promise.all(
+    GlobalDatabase.rawDatabases.map(async (d) => {
+      console.log(d.name);
+      await d.update();
+    }),
+  );
+  await GlobalDatabase.init();
   ctx.body = { status: "ok" };
 });
 

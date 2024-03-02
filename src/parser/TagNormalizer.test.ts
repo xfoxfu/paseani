@@ -1,3 +1,4 @@
+import { GlobalDatabase } from "../database/index.js";
 import { PrefixMatchParser } from "./PrefixMatchParser.js";
 import { TagNormalizer } from "./TagNormalizer.js";
 import { TagType, chainedParse } from "./index.js";
@@ -5,17 +6,16 @@ import test from "ava";
 
 test("normalizes tags", async (t) => {
   const parser = new PrefixMatchParser();
-  parser.loadBasicPrefix();
+  GlobalDatabase.loadBasicPrefix();
 
-  parser.loadPrefix("TUcaptions", TagType.team);
-  parser.loadPrefix("2017春", "drop");
-  parser.loadPrefix("サクラクエスト", TagType.title);
-  parser.loadPrefix("SAKURA QUEST", TagType.title);
-  parser.loadPrefix("02", TagType.episode);
-  parser.loadPrefix("繁", TagType.subtitle_language);
-  parser.loadPrefix("720P", TagType.resolution);
-  parser.loadPrefix("MP4", TagType.file_type);
-  parser.loadPrefix("新人招募中", "drop");
+  GlobalDatabase.loadPrefix("TUcaptions", { type: TagType.team, stdName: ["TUCaptions"] });
+  GlobalDatabase.loadPrefix("2017春", { type: TagType.unknown, stdName: [] });
+  GlobalDatabase.loadPrefix("サクラクエスト", { type: TagType.title });
+  GlobalDatabase.loadPrefix("SAKURA QUEST", { type: TagType.title });
+  GlobalDatabase.loadPrefix("繁", { type: TagType.subtitle_language, stdName: ["zh-hant"] });
+  GlobalDatabase.loadPrefix("720P", { type: TagType.resolution, stdName: ["720p"] });
+  GlobalDatabase.loadPrefix("MP4", { type: TagType.file_type, stdName: ["mp4"] });
+  GlobalDatabase.loadPrefix("新人招募中", { type: TagType.unknown, stdName: [] });
 
   const normalizer = new TagNormalizer();
   await normalizer.init();
