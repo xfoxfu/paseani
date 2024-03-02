@@ -11,7 +11,7 @@ export class LinkEnricher extends Parser {
 
   public override rawParse(_name: string, builder: ResultBuilder): Result {
     for (const tag of _.clone(builder.tags)) {
-      const data = GlobalDatabase.trie.get(tag.value);
+      const data = GlobalDatabase.get(tag.value);
       for (const item of data?.data ?? []) {
         if (!item.link || item.type !== tag.type) continue;
         builder.addTag(TagType.link, item.link);

@@ -83,7 +83,7 @@ export class ResultBuilder {
   }
 
   public build(): Result {
-    const tags = _.uniqBy(this.tags, (t) => `${t.type}:${t.value}:${t.parser}`);
+    const tags = _.uniqBy(this.tags, (t) => `${t.type}:${t.value}`);
     return { tags, errors: this.errors };
   }
 }

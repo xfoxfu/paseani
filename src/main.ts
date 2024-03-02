@@ -18,8 +18,8 @@ const buildParsers = () => {
     new GJYParser(),
     new LilithOrAniParser(),
     new PrefixMatchParser(),
-    new LinkEnricher(),
     new TagNormalizer(),
+    new LinkEnricher(),
   ];
 };
 const initParsers = async () => {

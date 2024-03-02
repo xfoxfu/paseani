@@ -1,3 +1,4 @@
+import { log } from "../log.js";
 import { TagType } from "../parser/index.js";
 import { Trie } from "../trie.js";
 import { AniDBDatabase } from "./AniDBDatabase.js";
@@ -50,6 +51,7 @@ export class Database {
     this.trie = new Trie();
     this.loadBasicPrefix();
     await Promise.all(this.rawDatabases.map((d) => this.loadRawDatabase(d)));
+    log.info("database initialized");
   }
 
   public hasNoDrop(node: typeof this.trie): boolean {
