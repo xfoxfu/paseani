@@ -39,6 +39,11 @@ test("trie works", (t) => {
     { parser: "PrefixMatchParser", type: TagType.unknown, value: "NN" },
     { parser: "PrefixMatchParser", type: TagType.unknown, value: "BB" },
   ]);
+
+  t.deepEqual(parser.parse("01-99").tags, [{ type: TagType.episode, value: "01-99", parser: "PrefixMatchParser" }]);
+  t.deepEqual(parser.parse("2160x720").tags, [
+    { type: TagType.resolution, value: "2160x720", parser: "PrefixMatchParser" },
+  ]);
 });
 
 test("parses", (t) => {

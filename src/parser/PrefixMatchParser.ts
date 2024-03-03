@@ -9,10 +9,11 @@ export class PrefixMatchParser extends Parser {
     return builder.appliedParsers.length === 0 || builder.tags.filter((t) => t.type === TagType.title).length === 0;
   }
 
+  protected static readonly regex = [/^\d+$/, /^\d+-\d+$/, /^第\d+话$/, /^\d+x\d+$/, /新番$/];
+
   public override rawParse(name_: string, builder: ResultBuilder): void {
     const name = GlobalDatabase.normalizeName(name_);
     let i = 0;
-    let last_is_error = false;
     while (i < name.length) {
       // forward pass
       let node: typeof GlobalDatabase.trie | null = GlobalDatabase.trie;
@@ -40,20 +41,23 @@ export class PrefixMatchParser extends Parser {
         i = revert.i;
       }
       // a tag should only be closed at "breaking" characters
-      while (GlobalDatabase.hasNoDrop(node) && !name[i]?.match(/\p{P}|\s|★|\//u) && i < name.length) {
+      while (
+        i < name.length &&
+        GlobalDatabase.hasNoDrop(node) &&
+        (!name[i]?.match(/\p{P}|\s|★|\//u) ||
+          // and do not break a `00-99` eposide pattern
+          (["-", "x"].includes(name[i] ?? "") && word.match(/^\d+$/)))
+      ) {
         word += name_[i];
         i += 1;
         node = GlobalDatabase.trie;
       }
       // take some action
       if (GlobalDatabase.hasNoDrop(node)) {
-        if (!last_is_error) {
-          for (const tag of node.data ?? [{ type: TagType.unknown }]) {
-            builder.addTag(tag.type, word);
-          }
-        } else builder.tags[builder.tags.length - 1]!.value += word;
+        for (const tag of node.data ?? [{ type: TagType.unknown }]) {
+          builder.addTag(tag.type, word);
+        }
       }
-      last_is_error = !node.data;
     }
     // reprocessing of errors
     for (const tag of builder.tags) {
