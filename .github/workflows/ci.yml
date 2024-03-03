@@ -23,6 +23,8 @@ jobs:
         run: pnpm lint
       - name: build
         run: pnpm build
+      - name: sourcemap
+        run: pnpm run sentry:sourcemaps
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - name: test

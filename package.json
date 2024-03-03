@@ -6,7 +6,7 @@
   "private": true,
   "main": "src/lib.ts",
   "scripts": {
-    "build": "concurrently 'pnpm:build:*' --group && pnpm sentry:sourcemaps",
+    "build": "concurrently 'pnpm:build:*' --group",
     "build:ts": "tsc",
     "build:tailwind": "tailwindcss -o public/style.css",
     "test": "c8 --all --src src ava",
