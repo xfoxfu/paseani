@@ -9,9 +9,10 @@
     "module": "node16",
     "moduleResolution": "node16",
 
-    "inlineSourceMap": true,
     "removeComments": true,
     "inlineSources": true,
+    "sourceMap": true,
+    "sourceRoot": "/",
 
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -23,7 +24,6 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
-
     "skipLibCheck": true
   },
   "include": ["src/**/*"]

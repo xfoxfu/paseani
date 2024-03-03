@@ -5,7 +5,9 @@ import { GJYParser } from "./parser/GJYParser.js";
 import { LilithOrAniParser } from "./parser/LilithOrAniParser.js";
 import { PrefixMatchParser } from "./parser/PrefixMatchParser.js";
 import { TagNormalizer } from "./parser/TagNormalizer.js";
-import { chainedParse } from "./parser/index.js";
+import { TagType, chainedParse } from "./parser/index.js";
+import Sentry from "@sentry/node";
+import { nodeProfilingIntegration } from "@sentry/profiling-node";
 import express from "express";
 
 const parsers = [
@@ -30,6 +32,20 @@ void (async () => {
 
 const app = express();
 
+Sentry.init({
+  dsn: process.env["SENTRY_DSN"] ?? "",
+  integrations: [
+    new Sentry.Integrations.Http({ tracing: true }),
+    new Sentry.Integrations.Express({ app }),
+    nodeProfilingIntegration(),
+  ],
+  tracesSampleRate: 1.0,
+  profilesSampleRate: 1.0,
+});
+
+app.use(Sentry.Handlers.requestHandler());
+app.use(Sentry.Handlers.tracingHandler());
+
 app.get("/info", (req, res) => {
   const name = req.query["name"] as string;
   if (typeof name !== "string") {
@@ -37,10 +53,16 @@ app.get("/info", (req, res) => {
     return;
   }
   const result = chainedParse(parsers, name);
+  for (const tag of result.tags) {
+    if (tag.type === TagType.unknown) Sentry.captureMessage(`Unknown tag '${tag.value}'`, { level: "warning" });
+  }
+  for (const error of result.errors) {
+    Sentry.captureMessage(`${error.parser}: ${error.message}`, { level: "error" });
+  }
   res.status(200).send(result);
 });
 
-app.post("/internal/database/update", (req, res) => {
+app.post("/internal/database/update", (req, res, next) => {
   (async () => {
     if ((req.query["token"] ?? "INVALID_TOKEN") !== process.env["PASEANI_ADMIN_TOKEN"]) {
       return { status: "invalid_token" };
@@ -55,10 +77,12 @@ app.post("/internal/database/update", (req, res) => {
     return { status: "ok" };
   })()
     .then((data) => res.status(200).send(data))
-    .catch((err: Error & { status?: number }) => res.status(err.status ?? 500).send({ message: err.message }));
+    .catch((err) => next(err));
 });
 
 app.use(express.static("public"));
+
+app.use(Sentry.Handlers.errorHandler());
 
 app.listen(3000);
 

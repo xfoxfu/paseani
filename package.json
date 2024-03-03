@@ -6,7 +6,7 @@
   "private": true,
   "main": "src/lib.ts",
   "scripts": {
-    "build": "concurrently 'pnpm:build:*' --group",
+    "build": "concurrently 'pnpm:build:*' --group && pnpm sentry:sourcemaps",
     "build:ts": "tsc",
     "build:tailwind": "tailwindcss -o public/style.css",
     "test": "c8 --all --src src ava",
@@ -16,7 +16,8 @@
     "lint": "concurrently 'pnpm:lint:*' --group",
     "format": "prettier --ignore-unknown --write 'src/**/*'",
     "start": "node dist/main.js",
-    "start:dev": "tsx watch src/main.ts"
+    "start:dev": "tsx watch src/main.ts",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org xfoxfu --project paseani ./dist && sentry-cli sourcemaps upload --org xfoxfu --project paseani ./dist"
   },
   "keywords": [],
   "author": "Yuze Fu <i@xfox.me>",
@@ -43,6 +44,9 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@sentry/cli": "^2.28.6",
+    "@sentry/node": "^7.104.0",
+    "@sentry/profiling-node": "^7.104.0",
     "express": "^4.18.3",
     "fast-xml-parser": "^4.3.5",
     "jszip": "^3.10.1",

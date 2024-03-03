@@ -23,6 +23,8 @@ jobs:
         run: pnpm lint
       - name: build
         run: pnpm build
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - name: test
         run: pnpm test
       - name: generate lcov coverage
