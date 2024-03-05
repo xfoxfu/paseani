@@ -12,7 +12,7 @@
     "removeComments": true,
     "inlineSources": true,
     "sourceMap": true,
-    "sourceRoot": "/",
+    "sourceRoot": "src",
 
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

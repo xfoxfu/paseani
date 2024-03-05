@@ -9,7 +9,7 @@
     "build": "concurrently 'pnpm:build:*' --group",
     "build:ts": "tsc",
     "build:tailwind": "tailwindcss -o public/style.css",
-    "test": "c8 --all --src src ava",
+    "test": "c8 --all --src dist ava",
     "test:watch": "ava --watch",
     "lint:eslint": "eslint 'src/**/*.{ts,tsx}'",
     "lint:prettier": "prettier --ignore-unknown --check 'src/**/*'",
