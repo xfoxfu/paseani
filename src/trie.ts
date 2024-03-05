@@ -1,3 +1,5 @@
+import log from "loglevel";
+
 export class Trie<T> {
   public children = new Map<string, Trie<T>>();
   public data: T | null = null;
@@ -44,7 +46,7 @@ export class Trie<T> {
       return this.children.get(name) ?? null;
     }
 
-    // log.debug("trie traverse", name[0], name.substring(1));
+    log.trace("trie traverse", name[0], name.substring(1));
     return this.children.get(name[0]!)?.get(name.substring(1)) ?? null;
   }
 }

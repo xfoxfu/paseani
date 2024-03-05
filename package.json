@@ -52,8 +52,8 @@
     "jszip": "^3.10.1",
     "ky": "^1.2.2",
     "lodash": "^4.17.21",
-    "opencc-js": "^1.0.5",
-    "tslog": "^4.9.2"
+    "loglevel": "^1.9.1",
+    "opencc-js": "^1.0.5"
   },
   "prettier": {
     "printWidth": 120,

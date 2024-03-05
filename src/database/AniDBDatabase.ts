@@ -1,10 +1,10 @@
-import { log } from "../log.js";
 import { TagType } from "../parser/index.js";
 import { Type as AniDBType, AniDBXml } from "./AniDBDatabaseXml.js";
 import { RawDatabase } from "./RawDatabase.js";
 import { Data } from "./index.js";
 import { XMLParser } from "fast-xml-parser";
 import ky from "ky";
+import log from "loglevel";
 import { open, writeFile } from "node:fs/promises";
 
 interface AniDBData {

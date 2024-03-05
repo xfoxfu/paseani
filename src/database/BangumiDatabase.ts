@@ -1,10 +1,10 @@
-import { log } from "../log.js";
 import { TagType } from "../parser/index.js";
 import { RawDatabase } from "./RawDatabase.js";
 import { Data } from "./index.js";
 import JSZip from "jszip";
 import ky from "ky";
 import _ from "lodash";
+import log from "loglevel";
 import { open, writeFile } from "node:fs/promises";
 
 export const parseInfoboxAlias = (infobox: string): string[] => {

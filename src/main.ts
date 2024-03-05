@@ -1,6 +1,5 @@
 import { GlobalDatabase } from "./database/index.js";
 import { LinkEnricher } from "./lib.js";
-import { log } from "./log.js";
 import { GJYParser } from "./parser/GJYParser.js";
 import { LilithOrAniParser } from "./parser/LilithOrAniParser.js";
 import { PrefixMatchParser } from "./parser/PrefixMatchParser.js";
@@ -9,6 +8,9 @@ import { TagType, chainedParse } from "./parser/index.js";
 import Sentry from "@sentry/node";
 import { nodeProfilingIntegration } from "@sentry/profiling-node";
 import express from "express";
+import log from "loglevel";
+
+log.setLevel((process.env["LOG_LEVEL"] as "trace" | "debug" | "info" | "warn" | "error") ?? log.levels.INFO);
 
 const parsers = [
   new GJYParser(),

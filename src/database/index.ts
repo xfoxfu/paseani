@@ -1,10 +1,10 @@
-import { log } from "../log.js";
 import { TagType } from "../parser/index.js";
 import { Trie } from "../trie.js";
 import { AniDBDatabase } from "./AniDBDatabase.js";
 import { BangumiDatabase } from "./BangumiDatabase.js";
 import { PrefixDatabase } from "./PrefixDatabase.js";
 import { RawDatabase } from "./RawDatabase.js";
+import log from "loglevel";
 import * as OpenCC from "opencc-js";
 
 export interface Data {
