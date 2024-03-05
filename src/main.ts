@@ -10,6 +10,17 @@ import { nodeProfilingIntegration } from "@sentry/profiling-node";
 import express from "express";
 import log from "loglevel";
 
+// validate env vars
+if (process.env["LOG_LEVEL"] && !["trace", "debug", "info", "warn", "error"].includes(process.env["LOG_LEVEL"])) {
+  throw new Error("invalid LOG_LEVEL");
+}
+if (!process.env["SENTRY_DSN"]) {
+  log.warn("SENTRY_DSN not set, will not report error to sentry");
+}
+if (!process.env["PASEANI_ADMIN_TOKEN"]) {
+  log.warn("PASEANI_ADMIN_TOKEN not set");
+}
+
 log.setLevel((process.env["LOG_LEVEL"] as "trace" | "debug" | "info" | "warn" | "error") ?? log.levels.INFO);
 
 const parsers = [
