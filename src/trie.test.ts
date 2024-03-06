@@ -26,6 +26,7 @@ test("getFurthest", (t) => {
   trie.addChild("Foo", 1);
   trie.addChild("Foo Bar", 2);
   trie.addChild("Baz", 3);
+  trie.addChild(" ", 4);
 
   assertFurthest(t, trie.getFurthestWithData("Foo"), 3, trie.get("Foo"));
   assertFurthest(t, trie.getFurthestWithData("Foo Bar"), 7, trie.get("Foo Bar"));
@@ -37,4 +38,5 @@ test("getFurthest", (t) => {
   assertFurthest(t, trie.getFurthestWithData("Foo ABC"), 3, trie.get("Foo"));
   assertFurthest(t, trie.getFurthestWithData("Foo "), 3, trie.get("Foo"));
   assertFurthest(t, trie.getFurthestWithData("Baz Baz"), 3, trie.get("Baz"));
+  assertFurthest(t, trie.getFurthestWithData(" Baz"), 1, trie.get(" "));
 });

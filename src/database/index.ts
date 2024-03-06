@@ -62,8 +62,9 @@ export class Database {
     return norm;
   }
 
-  public loadPrefix(name: string, data: Omit<Data, "name">, dbName = "NoDB") {
-    const normName = this.normalizeName(name).replace(" ", "");
+  public loadPrefix(name: string, data: Omit<Data, "name">, dbName = "NoDB", replaceSpace = true) {
+    let normName = this.normalizeName(name);
+    if (replaceSpace) normName = normName.replace(" ", "");
     let existingData = this.trie.get(normName);
     const newData = { ...data, name, sourceName: dbName };
     if (!existingData?.data) {
@@ -75,7 +76,7 @@ export class Database {
   protected static readonly BASIC_PREFIX = " \t[]/_-()【】★（）·◆☆\u{200B}&.".split("");
   public loadBasicPrefix() {
     for (const p of Database.BASIC_PREFIX) {
-      this.loadPrefix(p, { type: TagType.unknown, stdName: [] }, "BasicPrefixDb");
+      this.loadPrefix(p, { type: TagType.unknown, stdName: [] }, "BasicPrefixDb", false);
     }
   }
 
