@@ -63,7 +63,7 @@ export class Database {
   }
 
   public loadPrefix(name: string, data: Omit<Data, "name">, dbName = "NoDB") {
-    const normName = this.normalizeName(name);
+    const normName = this.normalizeName(name).replace(" ", "");
     let existingData = this.trie.get(normName);
     const newData = { ...data, name, sourceName: dbName };
     if (!existingData?.data) {
