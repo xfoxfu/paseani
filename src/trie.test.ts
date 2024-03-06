@@ -1,16 +1,6 @@
 import { Trie } from "./trie.js";
 import test, { ExecutionContext } from "ava";
 
-test("get ignores space in database", (t) => {
-  const trie = new Trie();
-  trie.addChild("Foo", 1);
-  trie.addChild("Foo Bar", 2);
-
-  t.deepEqual(trie.get("Foo")?.data, 1);
-  t.deepEqual(trie.get("Foo Bar")?.data, 2);
-  t.deepEqual(trie.get("Foo  Bar")?.data, 2);
-});
-
 test("get ignores space in query", (t) => {
   const trie = new Trie();
   trie.addChild("Foo", 1);

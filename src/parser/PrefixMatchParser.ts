@@ -25,11 +25,12 @@ export class PrefixMatchParser extends Parser {
     let rest_ = name_;
     while (rest !== "") {
       const [ppos, node] = GlobalDatabase.trie.getFurthestWithData(rest);
-      const bpos = PrefixMatchParser.breakingRegex.exec(rest)?.index ?? rest.length;
+      const bmatch = PrefixMatchParser.breakingRegex.exec(rest);
+      const bleft = bmatch?.index ?? rest.length;
       let [pos, data] = [ppos, node?.data?.map((d) => d.type)];
       // extend to breaking character
-      if (bpos > ppos && data !== undefined) {
-        pos = bpos;
+      if (bleft > ppos && data !== undefined) {
+        pos = bleft;
         data = [TagType.unknown];
       }
       // try regex matching
@@ -48,7 +49,8 @@ export class PrefixMatchParser extends Parser {
       }
       // last resort of mark unknown
       if (pos === 0) {
-        pos = bpos;
+        pos = bleft;
+        if (pos === 0) pos += bmatch?.[0].length ?? 1;
         data = [TagType.unknown];
       }
       assert(pos > 0);

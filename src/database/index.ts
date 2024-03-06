@@ -20,8 +20,46 @@ export class Database {
   public readonly opencc = OpenCC.Converter({ from: "t", to: "cn" });
   public readonly rawDatabases = [new AniDBDatabase(), new BangumiDatabase(), new PrefixDatabase()];
 
+  protected static readonly FULL_TO_HALF = {
+    "！": "!",
+    "＂": '"',
+    "＃": "#",
+    "＄": "$",
+    "％": "%",
+    "＆": "&",
+    "＇": "'",
+    "（": "(",
+    "）": ")",
+    "＊": "*",
+    "＋": "+",
+    "，": ",",
+    "－": "-",
+    "．": ".",
+    "／": "/",
+    "：": ":",
+    "；": ";",
+    "＜": "<",
+    "＝": "=",
+    "＞": ">",
+    "？": "?",
+    "＠": "@",
+    "［": "[",
+    "＼": "\\",
+    "］": "]",
+    "＾": "^",
+    "＿": "_",
+    "｀": "`",
+    "｛": "{",
+    "｜": "|",
+    "｝": "}",
+    "～": "~",
+  };
   public normalizeName(name: string): string {
-    return this.opencc(name).toLowerCase();
+    let norm = this.opencc(name).toLowerCase();
+    for (const [from, to] of Object.entries(Database.FULL_TO_HALF)) {
+      norm = norm.replaceAll(from, to);
+    }
+    return norm;
   }
 
   public loadPrefix(name: string, data: Omit<Data, "name">, dbName = "NoDB") {
