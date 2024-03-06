@@ -54,7 +54,7 @@ export class AniDBDatabase extends RawDatabase {
   public override async update(): Promise<void> {
     const anidb = await ky("https://github.com/c032/anidb-animetitles-archive/raw/main/latest.xml").text();
     log.info("Got archive data file");
-    const parser = new XMLParser({ ignoreAttributes: false });
+    const parser = new XMLParser({ ignoreAttributes: false, parseTagValue: false });
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const data: AniDBXml = parser.parse(anidb);
     let result = "";

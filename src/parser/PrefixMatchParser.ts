@@ -14,8 +14,9 @@ export class PrefixMatchParser extends Parser {
   protected static readonly prefixRegex: [RegExp, TagType][] = [
     [/^\d+/, TagType.episode],
     [/^\d+-\d+/, TagType.episode],
-    [/^第(\d+)(话|集)/, TagType.episode],
+    [/^第\d+(话|集)/, TagType.episode],
     [/^\d+x\d+/, TagType.resolution],
+    [/^(\d+年)?\d+月新番/, TagType.unknown],
   ];
   protected static readonly breakingRegex = /\p{P}|\s|★|\//u;
 
@@ -25,30 +26,32 @@ export class PrefixMatchParser extends Parser {
     let rest_ = name_;
     while (rest !== "") {
       const [ppos, node] = GlobalDatabase.trie.getFurthestWithData(rest);
-      const bmatch = PrefixMatchParser.breakingRegex.exec(rest);
-      const bleft = bmatch?.index ?? rest.length;
       let [pos, data] = [ppos, node?.data?.map((d) => d.type)];
-      // extend to breaking character
-      if (bleft > ppos && data !== undefined) {
-        pos = bleft;
-        data = [TagType.unknown];
-      }
       // try regex matching
       if (data === undefined) {
         assert(pos === 0);
         const [altPos, altType] = _.first(
           _.sortBy(
-            PrefixMatchParser.prefixRegex.map(([r, type]): [number, TagType] => {
-              return [r.exec(rest)?.[0].length ?? 0, type];
-            }),
+            PrefixMatchParser.prefixRegex
+              .map(([r, type]): [number, TagType] => [r.exec(rest)?.[0].length ?? 0, type])
+              .filter(([p, _t]) => p > 0),
             (v) => -v[0],
           ),
         ) ?? [0, TagType.unknown];
-        pos = altPos;
-        data = [altType];
+        if (altPos > 0) {
+          pos = altPos;
+          data = [altType];
+        }
+      }
+      const bmatch = PrefixMatchParser.breakingRegex.exec(rest);
+      const bleft = bmatch?.index ?? rest.length;
+      // extend to breaking character
+      if (bleft > pos && data !== undefined) {
+        pos = bleft;
+        data = [TagType.unknown];
       }
       // last resort of mark unknown
-      if (pos === 0) {
+      if (pos === 0 || data === undefined) {
         pos = bleft;
         if (pos === 0) pos += bmatch?.[0].length ?? 1;
         data = [TagType.unknown];

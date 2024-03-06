@@ -9,16 +9,24 @@ export class TagNormalizer extends Parser {
     return true;
   }
 
-  protected static readonly regexEp = /^第(\d+)(话|集)$/;
+  protected static readonly normRegex: [RegExp, TagType | null][] = [
+    [/^(\d+)$/, TagType.episode],
+    [/^(\d+-\d+)$/, TagType.episode],
+    [/^第(\d+)(话|集)$/, TagType.episode],
+    [/^(\d+x\d+)$/, TagType.resolution],
+    [/^(\d+年)?\d+月新番$/, null],
+  ];
 
   public override rawParse(_name: string, builder: ResultBuilder): void {
     const originalTags = _.cloneDeep(builder.tags);
     _.remove(builder.tags);
     for (const tag of originalTags) {
-      const tagValue = GlobalDatabase.normalizeName(tag.value);
       const operation = ((): [TagType, string[]] => {
-        if (TagNormalizer.regexEp.test(tag.value)) {
-          return [TagType.episode, [_.trim(tagValue, "第话集")]];
+        for (const [regex, type] of TagNormalizer.normRegex) {
+          const match = regex.exec(tag.value);
+          if (!match) continue;
+          if (type === null) return [TagType.unknown, []];
+          return [type, [match[1] ?? match[0]]];
         }
 
         const dbData = _.first(GlobalDatabase.get(tag.value)?.data);
