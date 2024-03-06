@@ -82,7 +82,6 @@ app.post("/internal/database/update", (req, res, next) => {
     }
     await Promise.all(
       GlobalDatabase.rawDatabases.map(async (d) => {
-        console.log(d.name);
         await d.update();
       }),
     );

@@ -1,5 +1,7 @@
 import { GlobalDatabase } from "../database/index.js";
+import { splitAt } from "../util.js";
 import { Parser, ResultBuilder, TagType } from "./index.js";
+import assert from "assert";
 import _ from "lodash";
 
 export class PrefixMatchParser extends Parser {
@@ -9,73 +11,56 @@ export class PrefixMatchParser extends Parser {
     return builder.appliedParsers.length === 0 || builder.tags.filter((t) => t.type === TagType.title).length === 0;
   }
 
-  protected static readonly regex = [/^\d+$/, /^\d+-\d+$/, /^第\d+话$/, /^\d+x\d+$/, /新番$/];
+  protected static readonly prefixRegex: [RegExp, TagType][] = [
+    [/^\d+/, TagType.episode],
+    [/^\d+-\d+/, TagType.episode],
+    [/^第(\d+)(话|集)/, TagType.episode],
+    [/^\d+x\d+/, TagType.resolution],
+  ];
+  protected static readonly breakingRegex = /\p{P}|\s|★|\//u;
 
   public override rawParse(name_: string, builder: ResultBuilder): void {
     const name = GlobalDatabase.normalizeName(name_);
-    let i = 0;
-    while (i < name.length) {
-      // forward pass
-      let node: typeof GlobalDatabase.trie | null = GlobalDatabase.trie;
-      let word = "";
-      do {
-        node = node.children.get(name[i]!) ?? null;
-        word += name_[i];
-        i += 1;
-      } while (node?.children.has(name[i]!));
-      if (!node) node = GlobalDatabase.trie;
-      // here we reach some point the current node is valid but cannot go to a child
-      // backward pass
-      // go to some point which is associated with an action
-      const revert = { node, word, i };
-      while (!revert.node.data) {
-        if (!revert.node.parent) break;
-        revert.node = revert.node.parent;
-        revert.i -= 1;
-        revert.word = revert.word.substring(0, revert.word.length - 1);
+    let rest = name;
+    let rest_ = name_;
+    while (rest !== "") {
+      const [ppos, node] = GlobalDatabase.trie.getFurthestWithData(rest);
+      const bpos = PrefixMatchParser.breakingRegex.exec(rest)?.index ?? rest.length;
+      let [pos, data] = [ppos, node?.data?.map((d) => d.type)];
+      // extend to breaking character
+      if (bpos > ppos && data !== undefined) {
+        pos = bpos;
+        data = [TagType.unknown];
       }
-      if (revert.node !== GlobalDatabase.trie) {
-        // revert succeeded, do revert
-        node = revert.node;
-        word = revert.word;
-        i = revert.i;
+      // try regex matching
+      if (data === undefined) {
+        assert(pos === 0);
+        const [altPos, altType] = _.first(
+          _.sortBy(
+            PrefixMatchParser.prefixRegex.map(([r, type]): [number, TagType] => {
+              return [r.exec(rest)?.[0].length ?? 0, type];
+            }),
+            (v) => -v[0],
+          ),
+        ) ?? [0, TagType.unknown];
+        pos = altPos;
+        data = [altType];
       }
-      // a tag should only be closed at "breaking" characters
-      while (
-        i < name.length &&
-        GlobalDatabase.hasNoDrop(node) &&
-        (!name[i]?.match(/\p{P}|\s|★|\//u) ||
-          // and do not break a `00-99` eposide pattern
-          (["-", "x"].includes(name[i] ?? "") && word.match(/^\d+$/)))
-      ) {
-        word += name_[i];
-        i += 1;
-        node = GlobalDatabase.trie;
+      // last resort of mark unknown
+      if (pos === 0) {
+        pos = bpos;
+        data = [TagType.unknown];
       }
+      assert(pos > 0);
+      const [, next] = splitAt(rest, pos);
+      const [cur_, next_] = splitAt(rest_, pos);
       // take some action
-      if (GlobalDatabase.hasNoDrop(node)) {
-        for (const tag of node.data ?? [{ type: TagType.unknown }]) {
-          builder.addTag(tag.type, word);
-        }
+      assert(cur_.length > 0);
+      for (const tag of data) {
+        builder.addTag(tag, cur_);
       }
+      rest = next;
+      rest_ = next_;
     }
-    // reprocessing of errors
-    for (const tag of builder.tags) {
-      if (tag.parser !== this.name) continue;
-      if (tag.type !== TagType.unknown) continue;
-
-      const type = (() => {
-        const e = GlobalDatabase.normalizeName(tag.value);
-        if (e.match(/^\d+$/)) return TagType.episode;
-        if (e.match(/^\d+-\d+$/)) return TagType.episode;
-        if (e.match(/^第\d+话$/)) return TagType.episode;
-        if (e.match(/^\d+x\d+$/)) return TagType.resolution;
-        if (e.match(/新番$/)) return null;
-        return TagType.unknown;
-      })();
-      if (type !== null) tag.type = type;
-      else tag.value = "";
-    }
-    _.remove(builder.tags, (t) => t.parser === this.name && t.value.length === 0);
   }
 }

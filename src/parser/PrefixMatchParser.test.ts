@@ -13,6 +13,7 @@ test("trie works", (t) => {
     errors: [],
     tags: [
       { parser: "PrefixMatchParser", type: "title", value: "FOO" },
+      { parser: "PrefixMatchParser", type: "unknown", value: "/" },
       { parser: "PrefixMatchParser", type: "episode", value: "BAR" },
       { parser: "PrefixMatchParser", type: "unknown", value: "AA" },
       { parser: "PrefixMatchParser", type: "unknown", value: "BB" },
@@ -26,6 +27,7 @@ test("trie works", (t) => {
     errors: [],
     tags: [
       { parser: "PrefixMatchParser", type: "title", value: "darling in the franxx" },
+      { parser: "PrefixMatchParser", type: "unknown", value: " " },
       { parser: "PrefixMatchParser", type: "source_type", value: "生肉" },
     ],
   });
@@ -34,8 +36,12 @@ test("trie works", (t) => {
   GlobalDatabase.loadPrefix("堀与宫村", { type: TagType.title });
   GlobalDatabase.loadPrefix("堀与宫村 第二季", { type: TagType.title });
   t.deepEqual(parser.parse("堀与宫村").tags, [{ type: TagType.title, value: "堀与宫村", parser: "PrefixMatchParser" }]);
+  t.deepEqual(parser.parse("堀与宫村   第二季").tags, [
+    { type: TagType.title, value: "堀与宫村   第二季", parser: "PrefixMatchParser" },
+  ]);
   t.deepEqual(parser.parse("堀与宫村 NN BB").build().tags, [
     { parser: "PrefixMatchParser", type: TagType.title, value: "堀与宫村" },
+    { parser: "PrefixMatchParser", type: "unknown", value: " " },
     { parser: "PrefixMatchParser", type: TagType.unknown, value: "NN" },
     { parser: "PrefixMatchParser", type: TagType.unknown, value: "BB" },
   ]);
@@ -62,13 +68,21 @@ test("parses", (t) => {
   t.deepEqual(parser.parse("[TUcaptions][2017春][サクラクエスト/SAKURA QUEST][02][繁][720P MP4](新人招募中)").build(), {
     errors: [],
     tags: [
+      { parser: "PrefixMatchParser", type: "unknown", value: "[" },
       { parser: "PrefixMatchParser", type: "team", value: "TUcaptions" },
+      { parser: "PrefixMatchParser", type: "unknown", value: "]" },
+      { parser: "PrefixMatchParser", type: "unknown", value: "2017春" },
       { parser: "PrefixMatchParser", type: "title", value: "サクラクエスト" },
+      { parser: "PrefixMatchParser", type: "unknown", value: "/" },
       { parser: "PrefixMatchParser", type: "title", value: "SAKURA QUEST" },
       { parser: "PrefixMatchParser", type: "episode", value: "02" },
       { parser: "PrefixMatchParser", type: "subtitle_language", value: "繁" },
       { parser: "PrefixMatchParser", type: "resolution", value: "720P" },
+      { parser: "PrefixMatchParser", type: "unknown", value: " " },
       { parser: "PrefixMatchParser", type: "file_type", value: "MP4" },
+      { parser: "PrefixMatchParser", type: "unknown", value: "(" },
+      { parser: "PrefixMatchParser", type: "unknown", value: "新人招募中" },
+      { parser: "PrefixMatchParser", type: "unknown", value: ")" },
     ],
   });
 });

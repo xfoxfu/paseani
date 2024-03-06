@@ -29,7 +29,7 @@ export class TagNormalizer extends Parser {
 
       // modify tag
       const [type, [first, ...rest]] = operation;
-      builder.addTagWithParser(tag.parser + (tag.value !== first ? "*" : ""), type, first ?? "");
+      if (first) builder.addTagWithParser(tag.parser + (tag.value !== first ? "*" : ""), type, first);
       if (rest.length > 0) {
         builder.addTags(type, ...rest);
       }

@@ -1,7 +1,7 @@
 import { GlobalDatabase } from "../database/index.js";
 import { PrefixMatchParser } from "./PrefixMatchParser.js";
 import { TagNormalizer } from "./TagNormalizer.js";
-import { TagType, chainedParse } from "./index.js";
+import { ResultBuilder, TagType, chainedParse } from "./index.js";
 import test from "ava";
 
 test("normalizes tags", async (t) => {
@@ -11,7 +11,7 @@ test("normalizes tags", async (t) => {
   GlobalDatabase.loadPrefix("TUcaptions", { type: TagType.team, stdName: ["TUCaptions"] });
   GlobalDatabase.loadPrefix("2017春", { type: TagType.unknown, stdName: [] });
   GlobalDatabase.loadPrefix("サクラクエスト", { type: TagType.title });
-  GlobalDatabase.loadPrefix("SAKURA QUEST", { type: TagType.title });
+  GlobalDatabase.loadPrefix("SAKURA QUEST", { type: TagType.title, stdName: ["SAKURA QUEST"] });
   GlobalDatabase.loadPrefix("繁", { type: TagType.subtitle_language, stdName: ["zh-hant"] });
   GlobalDatabase.loadPrefix("720P", { type: TagType.resolution, stdName: ["720p"] });
   GlobalDatabase.loadPrefix("MP4", { type: TagType.file_type, stdName: ["mp4"] });
@@ -38,4 +38,9 @@ test("normalizes tags", async (t) => {
       ],
     },
   );
+
+  t.deepEqual(normalizer.parse("", new ResultBuilder().addTag(TagType.title, "SAKURA   QUEST")).build(), {
+    errors: [],
+    tags: [{ parser: "*", type: "title", value: "SAKURA QUEST" }],
+  });
 });

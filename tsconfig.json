@@ -12,7 +12,6 @@
     "removeComments": true,
     "inlineSources": true,
     "sourceMap": true,
-    "sourceRoot": "/",
 
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

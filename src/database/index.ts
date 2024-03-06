@@ -55,10 +55,10 @@ export class Database {
   }
 
   public hasNoDrop(node: typeof this.trie): boolean {
-    return node.data === null || node.data?.some((t) => (t.stdName?.length ?? 1) > 0);
+    return node.data === undefined || node.data?.some((t) => (t.stdName?.length ?? 1) > 0);
   }
 
-  public get(name: string): typeof this.trie | null {
+  public get(name: string): typeof this.trie | undefined {
     return this.trie.get(this.normalizeName(name));
   }
 }

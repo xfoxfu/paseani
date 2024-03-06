@@ -43,7 +43,7 @@ export class BangumiDatabase extends RawDatabase {
         const link = `https://bgm.tv/subject/${item.id}`;
         const stdName = [item.name ?? item.name_cn];
         if (item.name) {
-          yield { name: item.name, type: TagType.title, link };
+          yield { name: item.name, type: TagType.title, link, stdName };
         }
         if (item.name_cn) {
           yield { name: item.name_cn, type: TagType.title, link, stdName };
