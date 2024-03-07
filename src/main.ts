@@ -60,6 +60,7 @@ Sentry.init({
 app.use(Sentry.Handlers.requestHandler());
 app.use(Sentry.Handlers.tracingHandler());
 
+app.options("/info", cors());
 app.get("/info", cors(), (req, res) => {
   const name = req.query["name"] as string;
   if (typeof name !== "string") {
