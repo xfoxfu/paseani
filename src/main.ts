@@ -7,6 +7,7 @@ import { TagNormalizer } from "./parser/TagNormalizer.js";
 import { TagType, chainedParse } from "./parser/index.js";
 import Sentry from "@sentry/node";
 import { nodeProfilingIntegration } from "@sentry/profiling-node";
+import cors from "cors";
 import express from "express";
 import log from "loglevel";
 
@@ -59,7 +60,7 @@ Sentry.init({
 app.use(Sentry.Handlers.requestHandler());
 app.use(Sentry.Handlers.tracingHandler());
 
-app.get("/info", (req, res) => {
+app.get("/info", cors(), (req, res) => {
   const name = req.query["name"] as string;
   if (typeof name !== "string") {
     res.status(400).send({ error: "Query param `name` must be a string." });
