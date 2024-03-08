@@ -1,4 +1,9 @@
 import _ from "lodash";
+import log from "loglevel";
+
+if (process.env["NODE_ENV"] === "test") {
+  log.setLevel("silent");
+}
 
 export abstract class Parser {
   public abstract name: string;
