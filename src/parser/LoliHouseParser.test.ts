@@ -1,5 +1,5 @@
 import { LoliHouseParser } from "./LoliHouseParser.js";
-import { ResultBuilder, TagType } from "./index.js";
+import { ResultBuilder, simpleParse } from "./index.js";
 import test from "ava";
 
 test("can parser LoliHouse", (t) => {
@@ -22,12 +22,40 @@ test("can parser LoliHouse", (t) => {
   }
 
   t.deepEqual(
-    parser
-      .parse(
-        "[SweetSub&LoliHouse] 手工少女!! / Do It Yourself!! - 07v2 [WebRip 1080p HEVC-10bit AAC][简繁日内封字幕]（检索用：DIY）",
-      )
-      .build()
-      .tags.find((t) => t.type === TagType.episode)?.value,
-    "07",
+    simpleParse(
+      parser,
+      "[SweetSub&LoliHouse] 手工少女!! / Do It Yourself!! - 07v2 [WebRip 1080p HEVC-10bit AAC][简繁日内封字幕]（检索用：DIY）",
+    ),
+    [
+      "SweetSub",
+      "LoliHouse",
+      "手工少女!!",
+      "Do It Yourself!!",
+      "07",
+      "WebRip",
+      "1080p",
+      "HEVC-10bit",
+      "AAC",
+      "简繁日内封字幕",
+    ],
+  );
+
+  t.deepEqual(
+    simpleParse(
+      parser,
+      "[UHA-WINGS&LoliHouse] 孤独摇滚！纽带乐队LIVE -恒星- / 結束バンドLIVE -恒星- / Kessoku Band LIVE -Kousei- [BDRip 1080p HEVC-10bit FLAC][简繁内封字幕]",
+    ),
+    [
+      "UHA-WINGS",
+      "LoliHouse",
+      "孤独摇滚！纽带乐队LIVE -恒星-",
+      "結束バンドLIVE -恒星-",
+      "Kessoku Band LIVE -Kousei-",
+      "BDRip",
+      "1080p",
+      "HEVC-10bit",
+      "FLAC",
+      "简繁内封字幕",
+    ],
   );
 });

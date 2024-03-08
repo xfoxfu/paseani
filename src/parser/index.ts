@@ -104,3 +104,8 @@ export const chainedParse = (parsers: Parser[], name: string): Result => {
   }
   return result.build();
 };
+
+export const simpleParse = (parser: Parser, name: string, filterType?: TagType): string[] => {
+  const result = parser.parse(name).build();
+  return result.tags.filter((t) => t.type === filterType || !filterType).map((t) => t.value);
+};
