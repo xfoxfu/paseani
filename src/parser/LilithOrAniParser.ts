@@ -3,7 +3,7 @@ import _ from "lodash";
 
 export class LilithOrAniParser extends Parser {
   readonly regex =
-    /^\[(?<team>ANi|Lilith-Raws)\] (?<titles>.+?( \/ .+?)*) ?(- (?<episode>\d+(v\d+)?) |\[(?<episodes>\d+(-\d+)?)\])?(?<metas>(\[[^\]]+?\])+)$/;
+    /^\[(?<team>ANi|Lilith-Raws)\] ?(?<titles>.+?( \/ .+?)*) ?(- (?<episode>\d+(v\d+)?) |\[(?<episodes>\d+(-\d+)?)\])?(?<metas>(\[[^\]]+?\])+)$/;
 
   public override name = "LilithOrAniParser";
 

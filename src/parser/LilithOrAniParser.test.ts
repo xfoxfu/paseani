@@ -69,4 +69,22 @@ test("can parse properly", (t) => {
       ],
     },
   );
+  t.deepEqual(
+    t.context.parser
+      .parse("[ANi]Healer Girls 歌愈少女（僅限港澳臺地區）[01][1080P][Bilibili][WEB-DL][AAC AVC]")
+      .build(),
+    {
+      errors: [],
+      tags: [
+        { parser: "LilithOrAniParser", type: "team", value: "ANi" },
+        { parser: "LilithOrAniParser", type: "title", value: "Healer Girls 歌愈少女（僅限港澳臺地區）" },
+        { parser: "LilithOrAniParser", type: "episode", value: "01" },
+        { parser: "LilithOrAniParser", type: "unknown", value: "1080P" },
+        { parser: "LilithOrAniParser", type: "unknown", value: "Bilibili" },
+        { parser: "LilithOrAniParser", type: "unknown", value: "WEB-DL" },
+        { parser: "LilithOrAniParser", type: "unknown", value: "AAC" },
+        { parser: "LilithOrAniParser", type: "unknown", value: "AVC" },
+      ],
+    },
+  );
 });
