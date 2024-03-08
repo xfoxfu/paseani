@@ -3,7 +3,7 @@ import _ from "lodash";
 
 export class GJYParser extends Parser {
   readonly regex =
-    /^(\[.+\]|【推しの子】) (?<titles>.+?( \/ .+?)*?)( (- )?(?<episode>[\w.]+(\(\w+\))?))? (\((?<extra>[^)]+)\))?(?<extra2>(\[[^\]]+\])*)$/;
+    /^(\[.+\]|【推しの子】) (?<titles>.+?( \/ .+?)*?)( (- )?(?<episode>[\w.]+(\(\w+\))?))? (\((?<extra>[^)]+)\))?(?<extra2>(\[[^\]]+\])*)(\.\w{3})?$/;
 
   public override name = "GJYParser";
 

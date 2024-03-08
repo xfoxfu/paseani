@@ -99,4 +99,27 @@ test("can parse properly", (t) => {
       ],
     },
   );
+  t.deepEqual(
+    t.context.parser
+      .parse(
+        "[NC-Raws] 勇者鬥惡龍 達伊的大冒險 / Dragon Quest - Dai no Daibouken - 01 [Baha][WEB-DL][1080p][AVC AAC][CHT][MP4].mp4",
+      )
+      .build(),
+    {
+      errors: [],
+      tags: [
+        { parser: "GJYParser", type: "team", value: "NC-Raws" },
+        { parser: "GJYParser", type: "title", value: "勇者鬥惡龍 達伊的大冒險" },
+        { parser: "GJYParser", type: "title", value: "Dragon Quest - Dai no Daibouken" },
+        { parser: "GJYParser", type: "episode", value: "01" },
+        { parser: "GJYParser", type: "unknown", value: "Baha" },
+        { parser: "GJYParser", type: "unknown", value: "WEB-DL" },
+        { parser: "GJYParser", type: "unknown", value: "1080p" },
+        { parser: "GJYParser", type: "unknown", value: "AVC" },
+        { parser: "GJYParser", type: "unknown", value: "AAC" },
+        { parser: "GJYParser", type: "unknown", value: "CHT" },
+        { parser: "GJYParser", type: "unknown", value: "MP4" },
+      ],
+    },
+  );
 });
