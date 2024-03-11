@@ -149,7 +149,7 @@ export const prefixdb: Record<string, [TagType, string] | null> = {
   "tvb粤语": [TagType.source_team, "TVB粤语"],
   "x265": [TagType.video_type, "h265"],
   "movie": null,
-  "ma10p": [TagType.video_type, "h264|10-bit"],
+  "ma10p": [TagType.video_type, "h265|10-bit"],
   "webdl": [TagType.source_type, "WEB-DL"],
   "繁体中文字幕": [TagType.subtitle_language, "zh-hant"],
   "ova": null,
