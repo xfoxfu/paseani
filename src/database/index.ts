@@ -1,11 +1,11 @@
 import { TagType } from "../parser/index.js";
 import { Trie } from "../trie.js";
+import { normalize } from "../util.js";
 import { AniDBDatabase } from "./AniDBDatabase.js";
 import { BangumiDatabase } from "./BangumiDatabase.js";
 import { PrefixDatabase } from "./PrefixDatabase.js";
 import { RawDatabase } from "./RawDatabase.js";
 import log from "loglevel";
-import * as OpenCC from "opencc-js";
 
 export interface Data {
   name: string;
@@ -17,53 +17,10 @@ export interface Data {
 type TrieData = Data & { sourceName: string };
 export class Database {
   public trie = new Trie<TrieData[]>();
-  public readonly opencc = OpenCC.Converter({ from: "t", to: "cn" });
   public readonly rawDatabases = [new AniDBDatabase(), new BangumiDatabase(), new PrefixDatabase()];
 
-  protected static readonly FULL_TO_HALF = {
-    "！": "!",
-    "＂": '"',
-    "＃": "#",
-    "＄": "$",
-    "％": "%",
-    "＆": "&",
-    "＇": "'",
-    "（": "(",
-    "）": ")",
-    "＊": "*",
-    "＋": "+",
-    "，": ",",
-    "－": "-",
-    "．": ".",
-    "／": "/",
-    "：": ":",
-    "；": ";",
-    "＜": "<",
-    "＝": "=",
-    "＞": ">",
-    "？": "?",
-    "＠": "@",
-    "［": "[",
-    "＼": "\\",
-    "］": "]",
-    "＾": "^",
-    "＿": "_",
-    "｀": "`",
-    "｛": "{",
-    "｜": "|",
-    "｝": "}",
-    "～": "~",
-  };
-  public normalizeName(name: string): string {
-    let norm = this.opencc(name).toLowerCase();
-    for (const [from, to] of Object.entries(Database.FULL_TO_HALF)) {
-      norm = norm.replaceAll(from, to);
-    }
-    return norm;
-  }
-
   public loadPrefix(name: string, data: Omit<Data, "name">, dbName = "NoDB", replaceSpace = true) {
-    let normName = this.normalizeName(name);
+    let normName = normalize(name);
     if (replaceSpace) normName = normName.replace(" ", "");
     let existingData = this.trie.get(normName);
     const newData = { ...data, name, sourceName: dbName };
@@ -98,7 +55,7 @@ export class Database {
   }
 
   public get(name: string): typeof this.trie | undefined {
-    return this.trie.get(this.normalizeName(name));
+    return this.trie.get(normalize(name));
   }
 }
 

@@ -1,5 +1,5 @@
 import { GlobalDatabase } from "../database/index.js";
-import { splitAt } from "../util.js";
+import { normalize, splitAt } from "../util.js";
 import { Parser, ResultBuilder, TagType } from "./index.js";
 import assert from "assert";
 import _ from "lodash";
@@ -21,7 +21,7 @@ export class PrefixMatchParser extends Parser {
   protected static readonly breakingRegex = /\p{P}|\s|★|\//u;
 
   public override rawParse(name_: string, builder: ResultBuilder): void {
-    const name = GlobalDatabase.normalizeName(name_);
+    const name = normalize(name_);
     let rest = name;
     let rest_ = name_;
     while (rest !== "") {
