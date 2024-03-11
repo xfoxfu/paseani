@@ -8,7 +8,7 @@ export const testParser = <T extends Parser>(Parser: new () => T, titles: string
     test(`test ${parser.name} ${title}`, (t): void => {
       t.true(parser.canParse(title, new ResultBuilder()));
       const result = parser.parse(title, new ResultBuilder()).build();
-      t.true(result.errors.length === 0, `${title} ${result.errors.map((e) => e.message).join(",")}`);
+      t.true(result.errors.length === 0, result.errors.map((e) => e.message).join(","));
       t.true(result.tags.filter((t) => t.type === TagType.title).length > 0, "should have title");
       if (assertEp) t.true(result.tags.filter((t) => t.type === TagType.episode).length > 0, "should have ep");
     });

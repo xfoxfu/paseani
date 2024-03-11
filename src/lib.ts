@@ -3,6 +3,7 @@ export { LilithOrAniParser } from "./parser/LilithOrAniParser.js";
 export { LinkEnricher } from "./parser/LinkEnricher.js";
 export { LoliHouseBParser } from "./parser/LoliHouseBParser.js";
 export { LoliHouseParser } from "./parser/LoliHouseParser.js";
+export { NekomoeParser } from "./parser/NekomoeParser.js";
 export { PrefixMatchParser } from "./parser/PrefixMatchParser.js";
 export { TagNormalizer } from "./parser/TagNormalizer.js";
 export { Parser } from "./parser/index.js";
