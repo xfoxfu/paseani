@@ -1,4 +1,4 @@
-import { testParser } from "../testutil.js";
+import { testParser, testParserResult } from "../testutil.js";
 import { NekomoeParser } from "./NekomoeParser.js";
 import test_, { TestFn } from "ava";
 
@@ -21,6 +21,23 @@ testParser(
   [
     "【喵萌奶茶屋】★剧场版★[甲铁城的卡巴内瑞 海门决战/KABANERI OF THE IRON FORTRESS - THE BATTLE OF UNATO][BDRip][720p][简日双语]",
     "【喵萌奶茶屋】★劇場版★[龍與雀斑公主/Ryuu to Sobakasu no Hime][先行版][1080p][繁體][招募翻譯校對]",
+    "【喵萌奶茶屋】[烟花/升空的焰火，从下面看？还是从侧面看？/Uchiage Hanabi Shita kara Miru ka? Yoko kara Miru ka?][BDRip 1080p HEVC_Ma10p_FLAC][简繁外挂][Fin]",
   ],
   false,
+);
+
+testParserResult(
+  NekomoeParser,
+  "【喵萌奶茶屋】剧场版★[于离别之朝束起约定之花/道别的早晨就用约定之花点缀吧/在离别的清晨装饰约定之花/Sayonara no Asa ni Yakusoku no Hana o Kazarou][HEVC_FLAC][1080p][简体]",
+  [
+    "喵萌奶茶屋",
+    "于离别之朝束起约定之花",
+    "道别的早晨就用约定之花点缀吧",
+    "在离别的清晨装饰约定之花",
+    "sayonara no asa ni yakusoku no hana o kazarou",
+    "hevc",
+    "flac",
+    "1080p",
+    "简体",
+  ],
 );

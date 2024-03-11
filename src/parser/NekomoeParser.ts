@@ -3,7 +3,10 @@ import { Parser, ResultBuilder, TagType } from "./index.js";
 import _ from "lodash";
 
 export class NekomoeParser extends Parser {
-  readonly regex = /^\[喵萌奶茶屋\](★.+?★)?\[(?<titles>.+?)\]\[(?<ep>[\d-]+).+?\](?<extra>(\[.+\])+)(?<note>.+)?$/;
+  readonly regexA =
+    /^\[喵萌奶茶屋\](★?.+?★)?\[(?<titles>.+?)\](\[(?<ep>[\d-]+)(v\d+)?(end)?\])?(?<extra>(\[.+\])+)(?<note>.+)?$/;
+  readonly regexB =
+    /^\[喵萌奶茶屋\](★.+?★)?(?<titles>.+?)( - (?<ep>[\d-]+)(v\d+)?(end)?)?(?<extra>(\[.+\])+)(?<note>.+)?$/;
 
   public override name = "NekomoeParser";
 
@@ -13,14 +16,16 @@ export class NekomoeParser extends Parser {
 
   public override rawParse(name: string, builder: ResultBuilder) {
     name = normalize(name);
-    const parsed = this.regex.exec(name);
-    if (!parsed?.groups) {
+    const parsedA = this.regexA.exec(name);
+    const parsedB = this.regexB.exec(name);
+    const groups = parsedA?.groups ?? parsedB?.groups;
+    if (!groups) {
       builder.addError("failed to parse with regex");
       return builder;
     }
-    const { titles, ep, extra, note } = parsed.groups;
+    const { titles, ep, extra, note } = groups;
     if (!titles || !extra) {
-      builder.addError("missing groups for regex: found " + Object.keys(parsed.groups).join(","));
+      builder.addError("missing groups for regex: found " + Object.keys(groups).join(","));
     }
     builder.addTag(TagType.team, "喵萌奶茶屋");
     builder.addTags(TagType.title, ...(titles?.split("/") ?? []).map((t) => t.trim()));
@@ -28,7 +33,7 @@ export class NekomoeParser extends Parser {
     const metas = _.compact(
       extra
         ?.split("][")
-        .flatMap((m) => m.split(" "))
+        .flatMap((m) => m.split(" ").flatMap((n) => n.split("_")))
         .map((m) => _.trim(m, "[]()")),
     );
     builder.addTags(TagType.unknown, ...metas);

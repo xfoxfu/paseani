@@ -1,7 +1,6 @@
 export { GJYParser } from "./parser/GJYParser.js";
 export { LilithOrAniParser } from "./parser/LilithOrAniParser.js";
 export { LinkEnricher } from "./parser/LinkEnricher.js";
-export { LoliHouseBParser } from "./parser/LoliHouseBParser.js";
 export { LoliHouseParser } from "./parser/LoliHouseParser.js";
 export { NekomoeParser } from "./parser/NekomoeParser.js";
 export { PrefixMatchParser } from "./parser/PrefixMatchParser.js";

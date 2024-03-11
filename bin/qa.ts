@@ -1,15 +1,17 @@
 import { GlobalDatabase } from "../src/database/index.js";
-import { GJYParser, LilithOrAniParser, LoliHouseBParser, LoliHouseParser, NekomoeParser } from "../src/lib.js";
+import { GJYParser, LilithOrAniParser, LoliHouseParser, NekomoeParser } from "../src/lib.js";
 import { ResultBuilder, TagType, chainedParse } from "../src/parser/index.js";
 import { normalize } from "../src/util.js";
 import { readFile, writeFile } from "fs/promises";
+import log from "loglevel";
 import { tqdm } from "ts-tqdm";
+
+log.setLevel("silent");
 
 const parser = (() => {
   if (process.argv[2] === "GJYParser") return new GJYParser();
   if (process.argv[2] === "LilithOrAniParser") return new LilithOrAniParser();
   if (process.argv[2] === "LoliHouseParser") return new LoliHouseParser();
-  if (process.argv[2] === "LoliHouseBParser") return new LoliHouseBParser();
   if (process.argv[2] === "NekomoeParser") return new NekomoeParser();
   throw new Error(`invalid parser '${process.argv[2]}'`);
 })();
@@ -18,7 +20,7 @@ let ok = 0;
 let errored = 0;
 let unparsed = 0;
 
-let csv = "";
+let report = "";
 const main = async () => {
   await GlobalDatabase.init();
   const titles = (await readFile("data/qa/titles.csv")).toString("utf8");
@@ -35,10 +37,18 @@ const main = async () => {
     } else {
       ok += 1;
     }
-    csv += `${title},${status},${normalize(title as string)},${res.errors.map((x) => x.message).join(":")}\n`;
+    if (status !== "ok") {
+      report += `**${title}** \`${status}\`
+
+\`${normalize(title as string)}\`
+
+${res.errors.map((x) => x.message).join(":")}
+`;
+    }
   }
   console.log(`ok=${ok} unparsed=${unparsed} errored=${errored}`);
-  await writeFile("data/qa/result-loli.csv", csv);
+  await writeFile("data/qa/result.md", report);
+  console.log(`written report to data/qa/result.md`);
 };
 
 main().catch(console.error);

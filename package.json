@@ -9,6 +9,7 @@
     "build": "concurrently 'pnpm:build:*' --group",
     "build:ts": "tsc",
     "build:tailwind": "tailwindcss -o public/style.css",
+    "dev": "tsx watch src/main.ts",
     "test": "c8 --all --src dist --reporter text-summary ava",
     "test:watch": "ava --watch",
     "lint:eslint": "eslint 'src/**/*.{ts,tsx}'",

@@ -1,5 +1,6 @@
 import { testParser, testParserResult } from "../testutil.js";
 import { LoliHouseParser } from "./LoliHouseParser.js";
+import { TagType } from "./index.js";
 
 testParser(LoliHouseParser, [
   "[LoliHouse] 魔都精兵的奴隶 / Mato Seihei no Slave - 06 [WebRip 1080p HEVC-10bit AAC][繁體内封字幕]",
@@ -52,4 +53,23 @@ testParserResult(
     "FLAC",
     "简繁内封字幕",
   ],
+);
+
+testParser(LoliHouseParser, [
+  "[SweetSub&LoliHouse][轻拍翻转小魔女][Flip Flappers][11][WebRip 1920x1080 HEVC AAC][简繁外挂字幕]",
+  "[LoliHouse][乌菈菈迷路帖][Urara Meirochou][01][TVrip 1920x1080 HEVC AAC]【内附公告】",
+  "[LoliHouse][政宗君的复仇][Masamune-kun no Revenge][01-12合集][WebRip 1920x1080 HEVC AAC][Fin]（度盘内附字幕）",
+]);
+
+testParser(
+  LoliHouseParser,
+  ["[LoliHouse][避难所][Shelter][AnimeMV+制作访谈][WebRip 1920x1080 HEVC AAC][中英双语字幕][外挂字幕]"],
+  false,
+);
+
+testParserResult(
+  LoliHouseParser,
+  "[LoliHouse][政宗君的复仇][Masamune-kun no Revenge][01-12合集][WebRip 1920x1080 HEVC AAC][Fin]（度盘内附字幕）",
+  ["01-12"],
+  TagType.episode,
 );

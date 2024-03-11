@@ -1,5 +1,5 @@
 import { GlobalDatabase } from "./database/index.js";
-import { LinkEnricher } from "./lib.js";
+import { LinkEnricher, LoliHouseParser, NekomoeParser } from "./lib.js";
 import { GJYParser } from "./parser/GJYParser.js";
 import { LilithOrAniParser } from "./parser/LilithOrAniParser.js";
 import { PrefixMatchParser } from "./parser/PrefixMatchParser.js";
@@ -27,6 +27,8 @@ log.setLevel((process.env["LOG_LEVEL"] as "trace" | "debug" | "info" | "warn" | 
 const parsers = [
   new GJYParser(),
   new LilithOrAniParser(),
+  new LoliHouseParser(),
+  new NekomoeParser(),
   new PrefixMatchParser(),
   new TagNormalizer(),
   new LinkEnricher(),
