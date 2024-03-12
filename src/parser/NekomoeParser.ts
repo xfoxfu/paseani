@@ -1,12 +1,11 @@
-import { normalize } from "../util.js";
 import { Parser, ResultBuilder, TagType } from "./index.js";
 import _ from "lodash";
 
 export class NekomoeParser extends Parser {
   readonly regexA =
-    /^\[喵萌奶茶屋\](★?.+?★)?\[(?<titles>.+?)\](\[(?<ep>[\d-]+)(v\d+)?(end)?\])?(?<extra>(\[.+\])+)(?<note>.+)?$/;
+    /^\[喵萌奶茶屋\](★?.+?★)?\[(?<titles>.+?)\](\[(?<ep>[\d-]+)(v\d+)?(end)?\])?(?<extra>(\[.+\])+)(?<note>.+)?$/i;
   readonly regexB =
-    /^\[喵萌奶茶屋\](★.+?★)?(?<titles>.+?)( - (?<ep>[\d-]+)(v\d+)?(end)?)?(?<extra>(\[.+\])+)(?<note>.+)?$/;
+    /^\[喵萌奶茶屋\](★.+?★)?(?<titles>.+?)( - (?<ep>[\d-]+)(v\d+)?(end)?)?(?<extra>(\[.+\])+)(?<note>.+)?$/i;
 
   public override name = "NekomoeParser";
 
@@ -15,7 +14,7 @@ export class NekomoeParser extends Parser {
   }
 
   public override rawParse(name: string, builder: ResultBuilder) {
-    name = normalize(name);
+    name = name.replaceAll("【", "[").replaceAll("】", "]");
     const parsedA = this.regexA.exec(name);
     const parsedB = this.regexB.exec(name);
     const groups = parsedA?.groups ?? parsedB?.groups;
