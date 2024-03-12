@@ -1,5 +1,5 @@
 import { GlobalDatabase } from "../src/database/index.js";
-import { GJYParser, LilithOrAniParser, LoliHouseParser, NekomoeParser } from "../src/lib.js";
+import { GJYParser, LilithOrAniParser, LoliHouseParser, NekomoeParser, SakuratoParser } from "../src/lib.js";
 import { ResultBuilder, TagType, chainedParse } from "../src/parser/index.js";
 import { normalize } from "../src/util.js";
 import { readFile, writeFile } from "fs/promises";
@@ -13,6 +13,7 @@ const parser = (() => {
   if (process.argv[2] === "LilithOrAniParser") return new LilithOrAniParser();
   if (process.argv[2] === "LoliHouseParser") return new LoliHouseParser();
   if (process.argv[2] === "NekomoeParser") return new NekomoeParser();
+  if (process.argv[2] === "SakuratoParser") return new SakuratoParser();
   throw new Error(`invalid parser '${process.argv[2]}'`);
 })();
 
@@ -38,17 +39,16 @@ const main = async () => {
       ok += 1;
     }
     if (status !== "ok") {
-      report += `**${title}** \`${status}\`
-
-\`${normalize(title as string)}\`
-
+      report += `${title} (${status})
+${normalize(title as string)}
 ${res.errors.map((x) => x.message).join(":")}
+
 `;
     }
   }
   console.log(`ok=${ok} unparsed=${unparsed} errored=${errored}`);
-  await writeFile("data/qa/result.md", report);
-  console.log(`written report to data/qa/result.md`);
+  await writeFile("data/qa/result.txt", report);
+  console.log(`written report to data/qa/result.txt`);
 };
 
 main().catch(console.error);
