@@ -1,4 +1,5 @@
 export { GJYParser } from "./parser/GJYParser.js";
+export { GMTeamParser } from "./parser/GMTeamParser.js";
 export { LilithOrAniParser } from "./parser/LilithOrAniParser.js";
 export { LinkEnricher } from "./parser/LinkEnricher.js";
 export { LoliHouseParser } from "./parser/LoliHouseParser.js";
