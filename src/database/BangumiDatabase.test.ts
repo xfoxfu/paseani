@@ -15,4 +15,8 @@ test("parse alias in infobox", (t) => {
     "The Dangers in My Heart 2nd Season",
     "Boku no Kokoro no Yabai Yatsu 2nd Season",
   ]);
+  const aliases3 = parseInfoboxAlias(
+    "{{Infobox animanga/Anime\r\n|中文名= \r\n|别名={\r\n[台版|沙盒1]\r\n[日版|沙盒2]\r\n[沙盒0|沙盒3]\r\n}\r\n|上映年度= *\r\n|片长= \r\n|官方网站= \r\n|其他= \r\n|Copyright= \r\n|话数= 7\r\n|放送开始= 1960年\r\n|放送星期= 星期日\r\n|平台={\r\n[龟壳]\r\n[Xbox Series S]\r\n[Xbox Series X]\r\n[Xbox Series X/S]\r\n[PC]\r\n[Xbox Series X|S]\r\n}\r\n|其他别名=沙\r\n}}",
+  );
+  t.deepEqual(aliases3, ["沙盒1", "沙盒2", "沙盒3"]);
 });
