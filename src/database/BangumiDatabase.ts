@@ -9,7 +9,7 @@ import { open, writeFile } from "node:fs/promises";
 
 export const parseInfoboxAlias = (infobox: string): string[] => {
   const infoboxNorm = infobox.replaceAll(/\s\s+/g, "");
-  const aliasRegex = / ?别名 ?= ?{ ?(?<alias>(\[(.+?\|)?.+?\])+) ?}/;
+  const aliasRegex = /别名 ?= ?{ ?(?<alias>(\[([^\]]+?\|)?[^\]]+\])+) ?}/;
   const aliasMatch = aliasRegex.exec(infoboxNorm);
   const aliasText = aliasMatch?.groups?.["alias"];
   if (!aliasText) return [];
