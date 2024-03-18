@@ -8,20 +8,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Docker setup Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Docker metadata action
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         id: meta
         with:
           images: |
@@ -33,7 +33,7 @@ jobs:
             type=sha,enable=true,priority=100,prefix=commit-,suffix=,format=short
 
       - name: Publish images
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: .
           tags: ${{ steps.meta.outputs.tags }}
@@ -60,14 +60,10 @@ jobs:
           sudo apt-get install jq moreutils
       - run: |
           jq '.["paseani"]="${{ github.ref_name }}"' green-sg/release.json | sponge green-sg/release.json
-      - name: push update
-        uses: dmnemec/copy_file_to_another_repo_action@main
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.GH_TOKEN_INFRA }}
-        with:
-          source_file: "release.json"
-          destination_repo: "xfoxfu/infra"
-          destination_folder: "green-sg"
-          user_email: "gitops@noha.dev"
-          user_name: "Noha GitOps"
-          commit_message: "Upgrade PaseAni to ${{ env.RELEASE_VERSION }}"
+      - name: Push update
+        run: |
+          git config --global user.email gitops@noha.dev
+          git config --global user.name 'Noha GitOps'
+          git add .
+          git commit --message 'feat: upgrade paseani to ${{ github.ref_name }}'
+          git push -u origin HEAD:main
