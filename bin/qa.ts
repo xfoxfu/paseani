@@ -5,6 +5,7 @@ import {
   LilithOrAniParser,
   LoliHouseParser,
   NekomoeParser,
+  PrefixMatchParser,
   SakuratoParser,
 } from "../src/lib.js";
 import { ResultBuilder, TagType, chainedParse } from "../src/parser/index.js";
@@ -21,6 +22,7 @@ const parser = (() => {
   if (process.argv[2] === "NekomoeParser") return new NekomoeParser();
   if (process.argv[2] === "SakuratoParser") return new SakuratoParser();
   if (process.argv[2] === "GMTeamParser") return new GMTeamParser();
+  if (process.argv[2] === "PrefixMatchParser") return new PrefixMatchParser();
   throw new Error(`invalid parser '${process.argv[2]}'`);
 })();
 
@@ -48,6 +50,7 @@ const main = async () => {
     if (status !== "ok") {
       report += `${title} (${status})
 ${res.errors.map((x) => x.message).join(":")}
+${res.tags.map((x) => x.value).join(" | ")}
 
 `;
     }
