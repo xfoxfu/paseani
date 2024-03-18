@@ -42,3 +42,32 @@ jobs:
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  deploy:
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    needs: [container]
+    env:
+      RELEASE_VERSION: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: "xfoxfu/infra"
+          token: ${{ secrets.GH_TOKEN_INFRA }}
+      - name: Install jq and moreutils (sponge)
+        run: |
+          sudo apt-get update
+          sudo apt-get install jq moreutils
+      - run: |
+          jq '.["paseani"]="${{ github.ref_name }}"' green-sg/release.json | sponge green-sg/release.json
+      - name: push update
+        uses: dmnemec/copy_file_to_another_repo_action@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.GH_TOKEN_INFRA }}
+        with:
+          source_file: "release.json"
+          destination_repo: "xfoxfu/infra"
+          destination_folder: "green-sg"
+          user_email: "gitops@noha.dev"
+          user_name: "Noha GitOps"
+          commit_message: "Upgrade PaseAni to ${{ env.RELEASE_VERSION }}"
