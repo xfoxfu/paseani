@@ -14,7 +14,7 @@ export class PrefixMatchParser extends Parser {
   protected static readonly prefixRegex: [RegExp, TagType][] = [
     [/^\d+/, TagType.episode],
     [/^\d+-\d+/, TagType.episode],
-    [/^第\d+(话|集)/, TagType.episode],
+    [/^第\d+(-\d+)?(话|集)/, TagType.episode],
     [/^\d+x\d+/, TagType.resolution],
     [/^(\d+年)?\d+月新番/, TagType.unknown],
   ];

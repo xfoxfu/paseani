@@ -12,9 +12,9 @@ export class TagNormalizer extends Parser {
   protected static readonly normRegex: [RegExp, TagType | null][] = [
     [/^(\d+)$/, TagType.episode],
     [/^(\d+-\d+)$/, TagType.episode],
-    [/^第(\d+)(话|集)$/, TagType.episode],
+    [/^第(\d+(-\d+)?)(话|集)$/, TagType.episode],
     [/^(\d+x\d+)$/, TagType.resolution],
-    [/^(\d+年)?\d+月新番$/, null],
+    [/^(\d+年)?\d+月新?番$/, null],
   ];
 
   public override rawParse(_name: string, builder: ResultBuilder): void {

@@ -1,4 +1,5 @@
 import { TagType } from "../parser/index.js";
+import { normalize } from "../util.js";
 import { RawDatabase } from "./RawDatabase.js";
 import { Data } from "./index.js";
 
@@ -203,8 +204,25 @@ export const prefixdb: Record<string, [TagType, string] | null> = {
   "atx": [TagType.source_team, "ATX"],
   "10-bit": [TagType.video_type, "10-bit"],
   "8-bit": [TagType.video_type, "8-bit"],
-  "3840x2160": [TagType.video_type, "4k"],
+  "3840x2160": [TagType.resolution, "4k"],
   "opus": [TagType.audio_type, "opus"],
+  "hevc-10bit": [TagType.video_type, "h265|10-bit"],
+  "chs_cht_eng_th_srt": [TagType.subtitle_language, "zh-hans|zh-hant|en|th"],
+  "chs_cht_th_srt": [TagType.subtitle_language, "zh-hans|zh-hant|th"],
+  "tvb": [TagType.source_team, "TVB"],
+  "viutv": [TagType.source_team, "ViuTV"],
+  "viutv粵语": [TagType.source_team, "ViuTV"],
+  "简繁字幕": [TagType.subtitle_language, "zh-hans|zh-hant"],
+  "v2": null,
+  "skymoon-raws": [TagType.team, "Skymoon-Raws"],
+  "天月搬运组": [TagType.team, "天月搬运组"],
+  "天月字幕组": [TagType.team, "天月字幕组"],
+  "❀拨雪寻春❀": [TagType.team, "❀拨雪寻春❀"],
+  "云光字幕组": [TagType.team, "云光字幕组"],
+  "猎户压制部": [TagType.team, "猎户"],
+  "Amor字幕组": [TagType.team, "Amor"],
+  "简日字幕": [TagType.subtitle_language, "zh-hans|ja"],
+  "繁日字幕": [TagType.subtitle_language, "zh-hant|ja"],
 };
 
 export class PrefixDatabase extends RawDatabase {
@@ -213,7 +231,11 @@ export class PrefixDatabase extends RawDatabase {
   // eslint-disable-next-line @typescript-eslint/require-await
   public override async *list(): AsyncIterable<Data> {
     for (const [key, operation] of Object.entries(prefixdb)) {
-      yield { name: key, type: operation?.[0] ?? TagType.unknown, stdName: operation?.[1]?.split("|") ?? [] };
+      yield {
+        name: normalize(key),
+        type: operation?.[0] ?? TagType.unknown,
+        stdName: operation?.[1]?.split("|") ?? [],
+      };
     }
   }
 }
