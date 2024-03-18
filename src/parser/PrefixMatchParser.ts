@@ -19,6 +19,7 @@ export class PrefixMatchParser extends Parser {
     [/^(\d+年)?\d+月新番/, TagType.unknown],
   ];
   protected static readonly breakingRegex = /\p{P}|\s|★|\//u;
+  // protected static readonly breakingRegex = /\/|\]|\[|\(|\)|★|-/u;
 
   public override rawParse(name_: string, builder: ResultBuilder): void {
     const name = normalize(name_);
@@ -56,11 +57,21 @@ export class PrefixMatchParser extends Parser {
         if (pos === 0) pos += bmatch?.[0].length ?? 1;
         data = [TagType.unknown];
       }
-      assert(pos > 0);
-      const [, next] = splitAt(rest, pos);
+      if (!(pos > 0)) {
+        builder.addError("assertion failed (pos > 0)");
+        return;
+      }
+      const [cur, next] = splitAt(rest, pos);
       const [cur_, next_] = splitAt(rest_, pos);
       // take some action
-      assert(cur_.length > 0);
+      if (!(cur_.length > 0)) {
+        builder.addError("assertion failed (cur_.length > 0)");
+        return;
+      }
+      if (!(cur_.length == cur.length && next.length == next_.length)) {
+        builder.addError("assertion failed (cur_.length == cur.length && next.length == next_.length)");
+        return;
+      }
       for (const tag of data) {
         builder.addTag(tag, cur_);
       }
